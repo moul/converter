@@ -1,6 +1,9 @@
 package converter
 
-import "encoding/base64"
+import (
+	"encoding/base32"
+	"encoding/base64"
+)
 
 //type Type interface{}
 
@@ -15,6 +18,20 @@ func ConvertBytesToBase64(in interface{}, out *interface{}) error {
 
 func ConvertBase64ToBytes(in interface{}, out *interface{}) error {
 	data, err := base64.StdEncoding.DecodeString(in.(string))
+	if err != nil {
+		return err
+	}
+	*out = data
+	return nil
+}
+
+func ConvertBytesToBase32(in interface{}, out *interface{}) error {
+	*out = base32.StdEncoding.EncodeToString(in.([]byte))
+	return nil
+}
+
+func ConvertBase32ToBytes(in interface{}, out *interface{}) error {
+	data, err := base32.StdEncoding.DecodeString(in.(string))
 	if err != nil {
 		return err
 	}

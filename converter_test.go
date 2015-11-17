@@ -25,3 +25,23 @@ func TestConvertBase64ToBytes(t *testing.T) {
 		So(output, ShouldResemble, []byte("hello world!"))
 	})
 }
+
+func TestConvertBytesToBase32(t *testing.T) {
+	Convey("Testing ConvertBytesToBase32", t, func() {
+		input := []byte("hello world!")
+		var output interface{}
+		err := ConvertBytesToBase32(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldEqual, "NBSWY3DPEB3W64TMMQQQ====")
+	})
+}
+
+func TestConvertBase32ToBytes(t *testing.T) {
+	Convey("Testing ConvertBase32ToBytes", t, func() {
+		input := "NBSWY3DPEB3W64TMMQQQ===="
+		var output interface{}
+		err := ConvertBase32ToBytes(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldResemble, []byte("hello world!"))
+	})
+}
