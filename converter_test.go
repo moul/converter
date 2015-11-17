@@ -45,3 +45,23 @@ func TestConvertBase32ToBytes(t *testing.T) {
 		So(output, ShouldResemble, []byte("hello world!"))
 	})
 }
+
+func TestConvertBytesToString(t *testing.T) {
+	Convey("Testing ConvertBytesToString", t, func() {
+		input := []byte("hello world!")
+		var output interface{}
+		err := ConvertBytesToString(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldEqual, "hello world!")
+	})
+}
+
+func TestConvertStringToBytes(t *testing.T) {
+	Convey("Testing ConvertStringToBytes", t, func() {
+		input := "hello world!"
+		var output interface{}
+		err := ConvertStringToBytes(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldResemble, []byte("hello world!"))
+	})
+}

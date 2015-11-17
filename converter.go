@@ -38,3 +38,12 @@ func ConvertBase32ToBytes(in interface{}, out *interface{}) error {
 	*out = data
 	return nil
 }
+
+func ConvertBytesToString(in interface{}, out *interface{}) error {
+	*out = string(in.([]byte))
+	return nil
+}
+func ConvertStringToBytes(in interface{}, out *interface{}) error {
+	*out = []byte(in.(string))
+	return nil
+}
