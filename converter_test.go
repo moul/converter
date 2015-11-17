@@ -105,3 +105,23 @@ func TestConvertStringToInteger(t *testing.T) {
 		So(output, ShouldEqual, 1234567890)
 	})
 }
+
+func TestConvertStringToFloat(t *testing.T) {
+	Convey("Testing ConvertStringToFloat", t, func() {
+		input := "3.1415"
+		var output interface{}
+		err := ConvertStringToFloat(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldEqual, 3.1415)
+	})
+}
+
+func TestConvertFloatToString(t *testing.T) {
+	Convey("Testing ConvertStringToFloat", t, func() {
+		input := 3.1415
+		var output interface{}
+		err := ConvertFloatToString(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldEqual, "3.1415")
+	})
+}

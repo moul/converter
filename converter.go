@@ -74,3 +74,13 @@ func ConvertStringToInteger(in interface{}, out *interface{}) (err error) {
 	*out, err = strconv.Atoi(in.(string))
 	return err
 }
+
+func ConvertStringToFloat(in interface{}, out *interface{}) (err error) {
+	*out, err = strconv.ParseFloat(in.(string), 64)
+	return err
+}
+
+func ConvertFloatToString(in interface{}, out *interface{}) (err error) {
+	*out = strconv.FormatFloat(in.(float64), 'f', -1, 64)
+	return err
+}
