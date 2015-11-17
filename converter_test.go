@@ -65,3 +65,23 @@ func TestConvertStringToBytes(t *testing.T) {
 		So(output, ShouldResemble, []byte("hello world!"))
 	})
 }
+
+func TestConvertBytesToHex(t *testing.T) {
+	Convey("Testing ConvertBytesToHex", t, func() {
+		input := []byte("hello world!")
+		var output interface{}
+		err := ConvertBytesToHex(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldEqual, "68656c6c6f20776f726c6421")
+	})
+}
+
+func TestConvertHexBytes(t *testing.T) {
+	Convey("Testing ConvertHexToBytes", t, func() {
+		input := "68656c6c6f20776f726c6421"
+		var output interface{}
+		err := ConvertHexToBytes(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldResemble, []byte("hello world!"))
+	})
+}

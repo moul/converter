@@ -3,6 +3,7 @@ package converter
 import (
 	"encoding/base32"
 	"encoding/base64"
+	"encoding/hex"
 )
 
 //type Type interface{}
@@ -43,7 +44,22 @@ func ConvertBytesToString(in interface{}, out *interface{}) error {
 	*out = string(in.([]byte))
 	return nil
 }
+
 func ConvertStringToBytes(in interface{}, out *interface{}) error {
 	*out = []byte(in.(string))
+	return nil
+}
+
+func ConvertBytesToHex(in interface{}, out *interface{}) error {
+	*out = hex.EncodeToString(in.([]byte))
+	return nil
+}
+
+func ConvertHexToBytes(in interface{}, out *interface{}) error {
+	data, err := hex.DecodeString(in.(string))
+	if err != nil {
+		return err
+	}
+	*out = data
 	return nil
 }
