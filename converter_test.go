@@ -76,12 +76,32 @@ func TestConvertBytesToHex(t *testing.T) {
 	})
 }
 
-func TestConvertHexBytes(t *testing.T) {
+func TestConvertHexToBytes(t *testing.T) {
 	Convey("Testing ConvertHexToBytes", t, func() {
 		input := "68656c6c6f20776f726c6421"
 		var output interface{}
 		err := ConvertHexToBytes(input, &output)
 		So(err, ShouldBeNil)
 		So(output, ShouldResemble, []byte("hello world!"))
+	})
+}
+
+func TestConvertIntegerToString(t *testing.T) {
+	Convey("Testing ConvertIntegerToString", t, func() {
+		input := 1234567890
+		var output interface{}
+		err := ConvertIntegerToString(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldEqual, "1234567890")
+	})
+}
+
+func TestConvertStringToInteger(t *testing.T) {
+	Convey("Testing ConvertStringToInteger", t, func() {
+		input := "1234567890"
+		var output interface{}
+		err := ConvertStringToInteger(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldEqual, 1234567890)
 	})
 }

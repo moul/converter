@@ -4,6 +4,7 @@ import (
 	"encoding/base32"
 	"encoding/base64"
 	"encoding/hex"
+	"strconv"
 )
 
 //type Type interface{}
@@ -62,4 +63,14 @@ func ConvertHexToBytes(in interface{}, out *interface{}) error {
 	}
 	*out = data
 	return nil
+}
+
+func ConvertIntegerToString(in interface{}, out *interface{}) error {
+	*out = strconv.Itoa(in.(int))
+	return nil
+}
+
+func ConvertStringToInteger(in interface{}, out *interface{}) (err error) {
+	*out, err = strconv.Atoi(in.(string))
+	return err
 }
