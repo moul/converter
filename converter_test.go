@@ -6,6 +6,33 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+func Test_chaining(t *testing.T) {
+	Convey("Testing chaining", t, func() {
+		input := "hello world!"
+		var output1 interface{}
+		var err error
+
+		err = ConvertStringToBytes(input, &output1)
+		So(err, ShouldBeNil)
+		So(output1, ShouldResemble, []byte("hello world!"))
+
+		var output2 interface{}
+		err = ConvertBytesToHex(output1, &output2)
+		So(err, ShouldBeNil)
+		So(output2, ShouldEqual, "68656c6c6f20776f726c6421")
+
+		var output3 interface{}
+		err = ConvertHexToBytes(output2, &output3)
+		So(err, ShouldBeNil)
+		So(output3, ShouldResemble, []byte("hello world!"))
+
+		var output4 interface{}
+		err = ConvertBytesToString(output3, &output4)
+		So(err, ShouldBeNil)
+		So(output4, ShouldEqual, input)
+	})
+}
+
 func TestConvertBytesToBase64(t *testing.T) {
 	Convey("Testing ConvertBytesToBase64", t, func() {
 		input := []byte("hello world!")
