@@ -266,3 +266,20 @@ func ExampleConvertFloatToString() {
 	fmt.Println(output)
 	// Output: 3.1415
 }
+
+func TestConvertBytesToMd5sum(t *testing.T) {
+	Convey("Testing ConvertBytesToMd5sum", t, func() {
+		input := []byte("hello world!")
+		var output interface{}
+		err := ConvertBytesToMd5sum(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldEqual, "fc3ff98e8c6a0d3087d515c0473f8677")
+	})
+}
+
+func ExampleConvertBytesToMd5sum() {
+	var output interface{}
+	ConvertBytesToMd5sum([]byte("hello world!"), &output)
+	fmt.Println(output)
+	// Output: fc3ff98e8c6a0d3087d515c0473f8677
+}

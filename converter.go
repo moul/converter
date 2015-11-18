@@ -1,9 +1,11 @@
 package converter
 
 import (
+	"crypto/md5"
 	"encoding/base32"
 	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"strconv"
 )
 
@@ -103,5 +105,10 @@ func ConvertStringToFloat(in interface{}, out *interface{}) (err error) {
 
 func ConvertFloatToString(in interface{}, out *interface{}) (err error) {
 	*out = strconv.FormatFloat(in.(float64), 'f', -1, 64)
+	return err
+}
+
+func ConvertBytesToMd5sum(in interface{}, out *interface{}) (err error) {
+	*out = fmt.Sprintf("%x", md5.Sum(in.([]byte)))
 	return err
 }
