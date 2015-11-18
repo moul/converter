@@ -48,6 +48,21 @@ func TestPipe(t *testing.T) {
 	})
 }
 
+func TestChain(t *testing.T) {
+	Convey("Testing Chain", t, func() {
+		Convey(`float64(3.1415) | ConvertFloatToString | ConvertStringToBytes | ConvertBytesToBase64 | ConvertStringToBytes | ConvertBytesToBase32`, func() {
+			input := 3.1415
+			var output interface{}
+
+			chainFunc := Chain(ConvertFloatToString, ConvertStringToBytes, ConvertBytesToBase64, ConvertStringToBytes, ConvertBytesToBase32)
+
+			err := chainFunc(input, &output)
+			So(err, ShouldBeNil)
+			So(output, ShouldEqual, "JV4TI6COIRCTC===")
+		})
+	})
+}
+
 func TestConvertBytesToBase64(t *testing.T) {
 	Convey("Testing ConvertBytesToBase64", t, func() {
 		input := []byte("hello world!")
