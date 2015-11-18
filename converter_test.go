@@ -525,3 +525,11 @@ func TestConvertUnixDateToTime(t *testing.T) {
 		So(output.(time.Time).Nanosecond(), ShouldEqual, 123400000)
 	})
 }
+
+func ExampleConvertTimeToUnix() {
+	input := time.Date(1988, time.January, 25, 13, 10, 42, 0, time.UTC)
+	var output interface{}
+	ConvertTimeToUnix(input, &output)
+	fmt.Printf("%+v\n", output.(int64))
+	// Output: 570114642
+}
