@@ -469,6 +469,43 @@ func ExampleConvertUnixDateToTime() {
 	// Output: 2015-03-07 11:06:39.1234 +0000 PST
 }
 
+func ExampleConvertANSICToTime() {
+	input := `Sat Mar  7 11:06:39.1234 2015`
+	var output interface{}
+	ConvertANSICToTime(input, &output)
+	fmt.Printf("%+v\n", output)
+	// Output: 2015-03-07 11:06:39.1234 +0000 UTC
+}
+
+func ExampleConvertRFC822ToTime() {
+	input := `07 Mar 15 11:06 MST`
+	var output interface{}
+	ConvertRFC822ToTime(input, &output)
+	fmt.Printf("%+v\n", output)
+	// Output: 2015-03-07 11:06:00 +0000 MST
+}
+
+func ExampleConvertRFC850ToTime() {
+	input := `Saturday, 07-Mar-15 11:06:39 MST`
+	var output interface{}
+	ConvertRFC850ToTime(input, &output)
+	fmt.Printf("%+v\n", output)
+	// Output: 2015-03-07 11:06:39 +0000 MST
+}
+
+func ExampleConvertRFC1123ToTime() {
+	input := `Sat, 07 Mar 2015 11:06:39 MST`
+	var output interface{}
+	ConvertRFC1123ToTime(input, &output)
+	fmt.Printf("%+v\n", output)
+	// Output: 2015-03-07 11:06:39 +0000 MST
+}
+
+/* fixme: broken test
+func ExampleConvertRFC3339ToTime() {
+}
+*/
+
 func TestConvertUnixDateToTime(t *testing.T) {
 	Convey("Testing ConvertUnixDateToTime", t, func() {
 		input := `Sat Mar  7 11:06:39.1234 PST 2015`

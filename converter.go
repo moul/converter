@@ -163,7 +163,16 @@ var FiveSecondDelayer = Delayer(5 * time.Second)
 var TenSecondDelayer = Delayer(10 * time.Second)
 var OneMinuteDelayer = Delayer(time.Minute)
 
-func ConvertUnixDateToTime(in interface{}, out *interface{}) (err error) {
-	*out, err = time.Parse(time.UnixDate, in.(string))
-	return err
+func DateToTimeConverter(format string) ConversionFunc {
+	return func(in interface{}, out *interface{}) (err error) {
+		*out, err = time.Parse(format, in.(string))
+		return err
+	}
 }
+
+var ConvertANSICToTime = DateToTimeConverter(time.ANSIC)
+var ConvertRFC3339ToTime = DateToTimeConverter(time.RFC3339)
+var ConvertRFC822ToTime = DateToTimeConverter(time.RFC822)
+var ConvertRFC850ToTime = DateToTimeConverter(time.RFC850)
+var ConvertRFC1123ToTime = DateToTimeConverter(time.RFC1123)
+var ConvertUnixDateToTime = DateToTimeConverter(time.UnixDate)
