@@ -4,10 +4,12 @@ import (
 	"crypto/md5"
 	"encoding/base32"
 	"encoding/base64"
+	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -121,6 +123,12 @@ func ConvertJsonToStruct(in interface{}, out *interface{}) (err error) {
 
 func ConvertStructToJson(in interface{}, out *interface{}) (err error) {
 	*out, err = json.Marshal(in)
+	return err
+}
+
+func ConvertStringToCsv(in interface{}, out *interface{}) (err error) {
+	r := csv.NewReader(strings.NewReader(in.(string)))
+	*out, err = r.ReadAll()
 	return err
 }
 

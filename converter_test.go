@@ -294,7 +294,7 @@ func ExampleConvertJsonToStruct() {
 }
 
 func TestConvertJsonToStruct(t *testing.T) {
-	Convey("Testing ConvertBytesToMd5sum", t, func() {
+	Convey("Testing ConvertJsonToStruct", t, func() {
 		input := []byte(`["Hello",42,3.1415]`)
 		var output interface{}
 		err := ConvertJsonToStruct(input, &output)
@@ -316,7 +316,7 @@ func ExampleConvertStructToJson() {
 }
 
 func TestConvertStructToJson(t *testing.T) {
-	Convey("Testing ConvertBytesToMd5sum", t, func() {
+	Convey("Testing ConvertStructToJson", t, func() {
 		input := []interface{}{
 			"Hello", 42, 3.1415,
 		}
@@ -324,6 +324,40 @@ func TestConvertStructToJson(t *testing.T) {
 		err := ConvertStructToJson(input, &output)
 		So(err, ShouldBeNil)
 		So(output, ShouldResemble, []byte(`["Hello",42,3.1415]`))
+	})
+}
+
+func ExampleConvertStringToCsv() {
+	input := `first_name,last_name,username
+"Rob","Pike",rob
+Ken,Thompson,ken
+"Robert","Griesemer","gri"
+"Manfred",Touron,moul
+`
+	var output interface{}
+	ConvertStringToCsv(input, &output)
+	fmt.Printf("%+v\n", output)
+	// Output: [[first_name last_name username] [Rob Pike rob] [Ken Thompson ken] [Robert Griesemer gri] [Manfred Touron moul]]
+}
+
+func TestConvertStringToCsv(t *testing.T) {
+	Convey("Testing ConvertStringToCsv", t, func() {
+		input := `first_name,last_name,username
+"Rob","Pike",rob
+Ken,Thompson,ken
+"Robert","Griesemer","gri"
+"Manfred",Touron,moul
+`
+		var output interface{}
+		err := ConvertStringToCsv(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldResemble, [][]string{
+			[]string{"first_name", "last_name", "username"},
+			[]string{"Rob", "Pike", "rob"},
+			[]string{"Ken", "Thompson", "ken"},
+			[]string{"Robert", "Griesemer", "gri"},
+			[]string{"Manfred", "Touron", "moul"},
+		})
 	})
 }
 
