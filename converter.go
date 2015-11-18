@@ -5,6 +5,7 @@ import (
 	"encoding/base32"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
@@ -111,6 +112,15 @@ func ConvertFloatToString(in interface{}, out *interface{}) (err error) {
 
 func ConvertBytesToMd5sum(in interface{}, out *interface{}) (err error) {
 	*out = fmt.Sprintf("%x", md5.Sum(in.([]byte)))
+	return err
+}
+
+func ConvertJsonToStruct(in interface{}, out *interface{}) (err error) {
+	return json.Unmarshal(in.([]byte), out)
+}
+
+func ConvertStructToJson(in interface{}, out *interface{}) (err error) {
+	*out, err = json.Marshal(in)
 	return err
 }
 

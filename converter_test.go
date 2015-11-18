@@ -285,6 +285,48 @@ func ExampleConvertBytesToMd5sum() {
 	// Output: fc3ff98e8c6a0d3087d515c0473f8677
 }
 
+func ExampleConvertJsonToStruct() {
+	var output interface{}
+	input := []byte(`["Hello",42,3.1415]`)
+	ConvertJsonToStruct(input, &output)
+	fmt.Printf("%+v\n", output)
+	// Output: [Hello 42 3.1415]
+}
+
+func TestConvertJsonToStruct(t *testing.T) {
+	Convey("Testing ConvertBytesToMd5sum", t, func() {
+		input := []byte(`["Hello",42,3.1415]`)
+		var output interface{}
+		err := ConvertJsonToStruct(input, &output)
+		So(err, ShouldBeNil)
+		So(output.([]interface{})[0], ShouldEqual, "Hello")
+		So(output.([]interface{})[1], ShouldEqual, int(42))
+		So(output.([]interface{})[2], ShouldEqual, 3.1415)
+	})
+}
+
+func ExampleConvertStructToJson() {
+	var output interface{}
+	input := []interface{}{
+		"Hello", 42, 3.1415,
+	}
+	ConvertStructToJson(input, &output)
+	fmt.Printf("%s\n", output)
+	// Output: ["Hello",42,3.1415]
+}
+
+func TestConvertStructToJson(t *testing.T) {
+	Convey("Testing ConvertBytesToMd5sum", t, func() {
+		input := []interface{}{
+			"Hello", 42, 3.1415,
+		}
+		var output interface{}
+		err := ConvertStructToJson(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldResemble, []byte(`["Hello",42,3.1415]`))
+	})
+}
+
 func TestDelayer(t *testing.T) {
 	Convey("Testing Delayer", t, func() {
 		duration := time.Millisecond * 100
