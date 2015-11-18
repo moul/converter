@@ -7,7 +7,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func Test_chaining(t *testing.T) {
+func Test_manual_chaining(t *testing.T) {
 	Convey("Testing chaining", t, func() {
 		input := "hello world!"
 		var output1 interface{}
@@ -31,6 +31,20 @@ func Test_chaining(t *testing.T) {
 		err = ConvertBytesToString(output3, &output4)
 		So(err, ShouldBeNil)
 		So(output4, ShouldEqual, input)
+	})
+}
+
+func TestPipe(t *testing.T) {
+	Convey("Testing Pipe", t, func() {
+		Convey(`string("hello world!") | ConvertStringToBytes | ConvertBytesToBase64`, func() {
+			input := "hello world!"
+			var output interface{}
+
+			pipeFunc := Pipe(ConvertStringToBytes, ConvertBytesToBase64)
+			err := pipeFunc(input, &output)
+			So(err, ShouldBeNil)
+			So(output, ShouldEqual, "aGVsbG8gd29ybGQh")
+		})
 	})
 }
 

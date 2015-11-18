@@ -7,10 +7,23 @@ import (
 	"strconv"
 )
 
-//type Type interface{}
+type ConversionFunc func(interface{}, *interface{}) error
 
 type Conversion interface {
-	Convert(in interface{}, out *interface{}) error
+	// Convert func ConversionFunc
+}
+
+func Pipe(left, right ConversionFunc) ConversionFunc {
+	return func(in interface{}, output *interface{}) error {
+		var tmpOutput interface{}
+
+		err := left(in, &tmpOutput)
+		if err != nil {
+			return err
+		}
+
+		return right(tmpOutput, output)
+	}
 }
 
 func ConvertBytesToBase64(in interface{}, out *interface{}) error {
