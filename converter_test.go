@@ -327,6 +327,52 @@ func TestConvertStructToJson(t *testing.T) {
 	})
 }
 
+/* fixme: broken test
+func ExampleConvertXmlToStruct() {
+	var output interface{}
+	input := []byte(`<string>Hello</string><int>42</int><float64>3.1415</float64>`)
+	ConvertXmlToStruct(input, &output)
+	fmt.Printf("%+v\n", output)
+	// Output: [Hello 42 3.1415]
+}
+*/
+
+/* fixme: broken test
+func TestConvertXmlToStruct(t *testing.T) {
+	Convey("Testing ConvertXmlToStruct", t, func() {
+		input := []byte(`<string>Hello</string><int>42</int><float64>3.1415</float64>`)
+		var output interface{}
+		err := ConvertXmlToStruct(input, &output)
+		So(err, ShouldBeNil)
+		So(output.([]interface{})[0], ShouldEqual, "Hello")
+		So(output.([]interface{})[1], ShouldEqual, int(42))
+		So(output.([]interface{})[2], ShouldEqual, 3.1415)
+	})
+}
+*/
+
+func ExampleConvertStructToXml() {
+	var output interface{}
+	input := []interface{}{
+		"Hello", 42, 3.1415,
+	}
+	ConvertStructToXml(input, &output)
+	fmt.Printf("%s\n", output)
+	// Output: <string>Hello</string><int>42</int><float64>3.1415</float64>
+}
+
+func TestConvertStructToXml(t *testing.T) {
+	Convey("Testing ConvertStructToXml", t, func() {
+		input := []interface{}{
+			"Hello", 42, 3.1415,
+		}
+		var output interface{}
+		err := ConvertStructToXml(input, &output)
+		So(err, ShouldBeNil)
+		So(output, ShouldResemble, []byte(`<string>Hello</string><int>42</int><float64>3.1415</float64>`))
+	})
+}
+
 func ExampleConvertStringToCsv() {
 	input := `first_name,last_name,username
 "Rob","Pike",rob

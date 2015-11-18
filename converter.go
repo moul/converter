@@ -7,6 +7,7 @@ import (
 	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"strconv"
 	"strings"
@@ -123,6 +124,15 @@ func ConvertJsonToStruct(in interface{}, out *interface{}) (err error) {
 
 func ConvertStructToJson(in interface{}, out *interface{}) (err error) {
 	*out, err = json.Marshal(in)
+	return err
+}
+
+func ConvertXmlToStruct(in interface{}, out *interface{}) (err error) {
+	return xml.Unmarshal(in.([]byte), out)
+}
+
+func ConvertStructToXml(in interface{}, out *interface{}) (err error) {
+	*out, err = xml.Marshal(in)
 	return err
 }
 
