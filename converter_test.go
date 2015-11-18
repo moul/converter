@@ -3,6 +3,7 @@ package converter
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -282,4 +283,42 @@ func ExampleConvertBytesToMd5sum() {
 	ConvertBytesToMd5sum([]byte("hello world!"), &output)
 	fmt.Println(output)
 	// Output: fc3ff98e8c6a0d3087d515c0473f8677
+}
+
+func TestDelayer(t *testing.T) {
+	Convey("Testing Delayer", t, func() {
+		duration := time.Millisecond * 100
+		delayerFunc := Delayer(time.Millisecond * 100)
+
+		Convey("Testing on bytes", func() {
+			input := []byte("hello world!")
+			var output interface{}
+			t1 := time.Now()
+			err := delayerFunc(input, &output)
+			t2 := time.Now()
+			So(err, ShouldBeNil)
+			So(output, ShouldResemble, input)
+			So(t2.Sub(t1) >= duration, ShouldBeTrue)
+		})
+		Convey("Testing on integer", func() {
+			input := 1234567890
+			var output interface{}
+			t1 := time.Now()
+			err := delayerFunc(input, &output)
+			t2 := time.Now()
+			So(err, ShouldBeNil)
+			So(output, ShouldEqual, input)
+			So(t2.Sub(t1) >= duration, ShouldBeTrue)
+		})
+		Convey("Testing on float", func() {
+			input := 3.1415
+			var output interface{}
+			t1 := time.Now()
+			err := delayerFunc(input, &output)
+			t2 := time.Now()
+			So(err, ShouldBeNil)
+			So(output, ShouldEqual, input)
+			So(t2.Sub(t1) >= duration, ShouldBeTrue)
+		})
+	})
 }

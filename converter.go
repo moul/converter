@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 type ConversionFunc func(interface{}, *interface{}) error
@@ -112,3 +113,18 @@ func ConvertBytesToMd5sum(in interface{}, out *interface{}) (err error) {
 	*out = fmt.Sprintf("%x", md5.Sum(in.([]byte)))
 	return err
 }
+
+func Delayer(duration time.Duration) ConversionFunc {
+	return func(in interface{}, out *interface{}) error {
+		time.Sleep(duration)
+		*out = in
+		return nil
+	}
+}
+
+var HundredMillisecondDelayer = Delayer(100 * time.Millisecond)
+var OneSecondDelayer = Delayer(time.Second)
+var TwoSecondDelayer = Delayer(2 * time.Second)
+var FiveSecondDelayer = Delayer(5 * time.Second)
+var TenSecondDelayer = Delayer(10 * time.Second)
+var OneMinuteDelayer = Delayer(time.Minute)
