@@ -162,3 +162,8 @@ var TwoSecondDelayer = Delayer(2 * time.Second)
 var FiveSecondDelayer = Delayer(5 * time.Second)
 var TenSecondDelayer = Delayer(10 * time.Second)
 var OneMinuteDelayer = Delayer(time.Minute)
+
+func ConvertUnixDateToTime(in interface{}, out *interface{}) (err error) {
+	*out, err = time.Parse(time.UnixDate, in.(string))
+	return err
+}
