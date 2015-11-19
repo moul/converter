@@ -79,7 +79,6 @@ func TestChain(t *testing.T) {
 func TestConversionToStreamConv(t *testing.T) {
 	Convey("Testing ConversionToStreamConv", t, func() {
 		streamFn := ConversionToStreamConv(ConvertStringToBytes)
-
 		in := make(chan interface{}, 10)
 		out := streamFn(in)
 
@@ -89,9 +88,47 @@ func TestConversionToStreamConv(t *testing.T) {
 		So(<-out, ShouldResemble, []byte("hello world!"))
 		So(<-out, ShouldResemble, []byte("HELLO WORLD!"))
 		So(<-out, ShouldResemble, []byte("HeLlO wOrLd!"))
-		select {
-		case _, ok := <-out:
-			So(ok, ShouldBeFalse)
-		}
+		// select {
+		// case _, ok := <-out:
+		// 	So(ok, ShouldBeFalse)
+		// }
+	})
+}
+
+func TestStreamPipe(t *testing.T) {
+	Convey("Testing StreamPipe", t, func() {
+		streamPipe := StreamPipe(ConversionToStreamConv(ConvertStringToBytes), ConversionToStreamConv(ConvertBytesToBase64))
+		in := make(chan interface{}, 10)
+		out := streamPipe(in)
+
+		in <- "hello world!"
+		in <- "HELLO WORLD!"
+		in <- "HeLlO wOrLd!"
+		So(<-out, ShouldEqual, "aGVsbG8gd29ybGQh")
+		So(<-out, ShouldEqual, "SEVMTE8gV09STEQh")
+		So(<-out, ShouldEqual, "SGVMbE8gd09yTGQh")
+		// select {
+		// case _, ok := <-out:
+		// 	So(ok, ShouldBeFalse)
+		// }
+	})
+}
+
+func TestStreamChain(t *testing.T) {
+	Convey("Testing StreamChain", t, func() {
+		streamChain := StreamChain(ConversionToStreamConv(ConvertFloatToString), ConversionToStreamConv(ConvertStringToBytes), ConversionToStreamConv(ConvertBytesToBase64), ConversionToStreamConv(ConvertStringToBytes), ConversionToStreamConv(ConvertBytesToBase32))
+		in := make(chan interface{}, 10)
+		out := streamChain(in)
+
+		in <- 3.1415
+		in <- 4242.4242
+		in <- -123456789.987654321
+		So(<-out, ShouldEqual, "JV4TI6COIRCTC===")
+		So(<-out, ShouldEqual, "JZCESMCNNE2DATLKKF4Q====")
+		So(<-out, ShouldEqual, "JRKEK6KNPJITCTTKMM2E6UZUGVHUIYZSJZKFC6SNO46T2===")
+		// select {
+		// case _, ok := <-out:
+		// 	So(ok, ShouldBeFalse)
+		// }
 	})
 }

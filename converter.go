@@ -38,3 +38,19 @@ func ConversionToStreamConv(conversionFn ConversionFn) StreamConvFn {
 		return out
 	}
 }
+
+func StreamPipe(left, right StreamConvFn) StreamConvFn {
+	return func(in chan interface{}) chan interface{} {
+		return right(left(in))
+	}
+}
+
+func StreamChain(streamFuncs ...StreamConvFn) StreamConvFn {
+	return func(in chan interface{}) chan interface{} {
+		left := in
+		for _, right := range streamFuncs {
+			left = right(left)
+		}
+		return left
+	}
+}
