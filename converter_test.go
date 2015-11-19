@@ -75,3 +75,23 @@ func TestChain(t *testing.T) {
 		})
 	})
 }
+
+func TestConversionToStreamConv(t *testing.T) {
+	Convey("Testing ConversionToStreamConv", t, func() {
+		streamFn := ConversionToStreamConv(ConvertStringToBytes)
+
+		in := make(chan interface{}, 10)
+		out := streamFn(in)
+
+		in <- "hello world!"
+		in <- "HELLO WORLD!"
+		in <- "HeLlO wOrLd!"
+		So(<-out, ShouldResemble, []byte("hello world!"))
+		So(<-out, ShouldResemble, []byte("HELLO WORLD!"))
+		So(<-out, ShouldResemble, []byte("HeLlO wOrLd!"))
+		select {
+		case _, ok := <-out:
+			So(ok, ShouldBeFalse)
+		}
+	})
+}

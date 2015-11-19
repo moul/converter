@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func Delayer(duration time.Duration) ConversionFunc {
+func Delayer(duration time.Duration) ConversionFn {
 	return func(in interface{}, out *interface{}) error {
 		time.Sleep(duration)
 		*out = in

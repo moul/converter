@@ -2,7 +2,7 @@ package converter
 
 import "time"
 
-func DateToTimeConverter(format string) ConversionFunc {
+func DateToTimeConverter(format string) ConversionFn {
 	return func(in interface{}, out *interface{}) (err error) {
 		*out, err = time.Parse(format, in.(string))
 		return err
