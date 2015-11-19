@@ -60,17 +60,21 @@ func TestChain(t *testing.T) {
 			So(output, ShouldEqual, "JV4TI6COIRCTC===")
 		})
 		Convey(``, func() {
-			input := "http://httpbin.org/headers"
+			input := "http://manfred-touron.appspot.com"
 			var output interface{}
 
 			chainFunc := Chain(FetchUrlToBytes, ConvertJsonToStruct, ConvertStructToToml, ConvertBytesToString)
 
 			err := chainFunc(input, &output)
 			So(err, ShouldBeNil)
-			So(output, ShouldEqual, `[headers]
-  Accept-Encoding = "gzip"
-  Host = "httpbin.org"
-  User-Agent = "Go-http-client/1.1"
+			So(output, ShouldEqual, `emoji = "👌"
+firstname = "Manfred"
+github = "https://github.com/moul"
+headline = "For passion, madness and glory"
+lastname = "Touron"
+location = "Rouen, France / Paris, France"
+twitter = "https://twitter.com/moul"
+website = "http://m.42.am/"
 `)
 		})
 	})
