@@ -533,3 +533,29 @@ func ExampleConvertTimeToUnix() {
 	fmt.Printf("%+v\n", output.(int64))
 	// Output: 570114642
 }
+
+func ExampleFetchUrlToBytes() {
+	input := "http://sapin-as-a-service.appspot.com/?size=3"
+	var output interface{}
+	FetchUrlToBytes(input, &output)
+	fmt.Printf("%+s\n", string(output.([]byte)))
+	// Output:
+	//           *
+	//          ***
+	//         *****
+	//        *******
+	//         *****
+	//        *******
+	//       *********
+	//      ***********
+	//     *************
+	//      ***********
+	//     *************
+	//    ***************
+	//   *****************
+	//  *******************
+	// *********************
+	//          |||
+	//          |||
+	//          |||
+}

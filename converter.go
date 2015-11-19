@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -167,4 +169,14 @@ var ConvertUnixDateToTime = DateToTimeConverter(time.UnixDate)
 func ConvertTimeToUnix(in interface{}, out *interface{}) (err error) {
 	*out = in.(time.Time).Unix()
 	return nil
+}
+
+func FetchUrlToBytes(in interface{}, out *interface{}) error {
+	resp, err := http.Get(in.(string))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	*out, err = ioutil.ReadAll(resp.Body)
+	return err
 }
