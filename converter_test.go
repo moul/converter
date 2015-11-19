@@ -61,6 +61,20 @@ func TestChain(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(output, ShouldEqual, "JV4TI6COIRCTC===")
 		})
+		Convey(``, func() {
+			input := "http://httpbin.org/headers"
+			var output interface{}
+
+			chainFunc := Chain(FetchUrlToBytes, ConvertJsonToStruct, ConvertStructToToml, ConvertBytesToString)
+
+			err := chainFunc(input, &output)
+			So(err, ShouldBeNil)
+			So(output, ShouldEqual, `[headers]
+  Accept-Encoding = "gzip"
+  Host = "httpbin.org"
+  User-Agent = "Go-http-client/1.1"
+`)
+		})
 	})
 }
 
@@ -329,6 +343,21 @@ func ExampleConvertStructToJson() {
 	ConvertStructToJson(input, &output)
 	fmt.Printf("%s\n", output)
 	// Output: ["Hello",42,3.1415]
+}
+
+func ExampleConvertStructToToml() {
+	var output interface{}
+	input := map[string]interface{}{
+		"a": "Hello",
+		"b": 42,
+		"c": 3.1415,
+	}
+	ConvertStructToToml(input, &output)
+	fmt.Printf("%s\n", output)
+	// Output:
+	// a = "Hello"
+	// b = 42
+	// c = 3.1415
 }
 
 func TestConvertStructToJson(t *testing.T) {

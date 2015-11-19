@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"bytes"
 	"crypto/md5"
 	"crypto/sha1"
 	"encoding/base32"
@@ -15,6 +16,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/BurntSushi/toml"
 )
 
 type ConversionFunc func(interface{}, *interface{}) error
@@ -119,6 +122,13 @@ func ConvertJsonToStruct(in interface{}, out *interface{}) (err error) {
 
 func ConvertStructToJson(in interface{}, out *interface{}) (err error) {
 	*out, err = json.Marshal(in)
+	return err
+}
+
+func ConvertStructToToml(in interface{}, out *interface{}) (err error) {
+	buf := new(bytes.Buffer)
+	err = toml.NewEncoder(buf).Encode(in)
+	*out = buf.Bytes()
 	return err
 }
 
