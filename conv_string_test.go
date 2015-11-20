@@ -41,3 +41,22 @@ func TestLowercase(t *testing.T) {
 		})
 	})
 }
+
+func TestStreamBufferSplitLines(t *testing.T) {
+	Convey("Testing StreamBufferSplitLines", t, func() {
+		in := make(chan interface{}, 10)
+		out := StreamBufferSplitLines(in)
+
+		in <- []byte("hello world\nwhat's up ?\nok bye.")
+		in <- []byte("where is bryan ?\nbryan is in the kitchen.")
+		So(<-out, ShouldResemble, []byte("hello world"))
+		So(<-out, ShouldResemble, []byte("what's up ?"))
+		So(<-out, ShouldResemble, []byte("ok bye."))
+		So(<-out, ShouldResemble, []byte("where is bryan ?"))
+		So(<-out, ShouldResemble, []byte("bryan is in the kitchen."))
+		// select {
+		// case _, ok := <-out:
+		// 	So(ok, ShouldBeFalse)
+		// }
+	})
+}

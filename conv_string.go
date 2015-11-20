@@ -1,6 +1,9 @@
 package converter
 
-import "strings"
+import (
+	"bytes"
+	"strings"
+)
 
 func ReverseString(in interface{}, out *interface{}) (err error) {
 	runes := []rune(in.(string))
@@ -19,4 +22,20 @@ func Uppercase(in interface{}, out *interface{}) (err error) {
 func Lowercase(in interface{}, out *interface{}) (err error) {
 	*out = strings.ToLower(in.(string))
 	return nil
+}
+
+func StreamBufferSplitLines(in chan interface{}) chan interface{} {
+	out := make(chan interface{})
+	go func() {
+		for {
+			select {
+			case input := <-in:
+				var output interface{}
+				for _, output = range bytes.Split(input.([]byte), []byte("\n")) {
+					out <- output
+				}
+			}
+		}
+	}()
+	return out
 }
