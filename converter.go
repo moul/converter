@@ -54,3 +54,53 @@ func StreamChain(streamFuncs ...StreamConvFn) StreamConvFn {
 		return left
 	}
 }
+
+type Converter struct {
+	InputType              string
+	OutputType             string
+	Name                   string
+	ConversionFunc         ConversionFn
+	StreamConvFunc         StreamConvFn
+	IsDefaultTypeConverter bool
+}
+
+func (conv *Converter) SetType(ioType string) *Converter {
+	conv.InputType = ioType
+	conv.OutputType = ioType
+	return conv
+}
+
+func (conv *Converter) SetTypes(inType, outType string) *Converter {
+	conv.InputType = inType
+	conv.OutputType = outType
+	return conv
+}
+
+func (conv *Converter) SetConversionFunc(fn ConversionFn) *Converter {
+	conv.ConversionFunc = fn
+	return conv
+}
+
+func (conv *Converter) SetStreamConvFunc(fn StreamConvFn) *Converter {
+	conv.StreamConvFunc = fn
+	return conv
+}
+
+func (conv *Converter) SetDefaultTypeConverter() *Converter {
+	conv.IsDefaultTypeConverter = true
+	return conv
+}
+
+func NewConverter(name string) *Converter {
+	return &Converter{
+		InputType:  "interface{}",
+		OutputType: "interface{}",
+		Name:       name,
+	}
+}
+
+var RegisteredConverters []*Converter
+
+func RegisterConverter(converter *Converter) {
+	RegisteredConverters = append(RegisteredConverters, converter)
+}

@@ -13,6 +13,21 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+func init() {
+	RegisterConverter(NewConverter("base64-encode").SetTypes("[]byte", "string").SetConversionFunc(ConvertBytesToBase64))
+	RegisterConverter(NewConverter("base64-decode").SetTypes("string", "[]byte").SetConversionFunc(ConvertBase64ToBytes))
+	RegisterConverter(NewConverter("base32-encode").SetTypes("[]byte", "string").SetConversionFunc(ConvertBytesToBase32))
+	RegisterConverter(NewConverter("base32-decode").SetTypes("string", "[]byte").SetConversionFunc(ConvertBase32ToBytes))
+	RegisterConverter(NewConverter("hex-encode").SetTypes("[]byte", "string").SetConversionFunc(ConvertBytesToHex))
+	RegisterConverter(NewConverter("hex-decode").SetTypes("string", "[]byte").SetConversionFunc(ConvertHexToBytes))
+	RegisterConverter(NewConverter("xml-encode").SetTypes("interface{}", "[]byte").SetConversionFunc(ConvertStructToXml))
+	RegisterConverter(NewConverter("xml-decode").SetTypes("[]byte", "interface{}").SetConversionFunc(ConvertXmlToStruct))
+	RegisterConverter(NewConverter("json-encode").SetTypes("interface{}", "[]byte").SetConversionFunc(ConvertStructToJson))
+	RegisterConverter(NewConverter("json-decode").SetTypes("[]byte", "interface{}").SetConversionFunc(ConvertJsonToStruct))
+	RegisterConverter(NewConverter("toml-encode").SetTypes("[]byte", "interface{}").SetConversionFunc(ConvertStructToToml))
+	RegisterConverter(NewConverter("csv-decode").SetTypes("string", "[][]string").SetConversionFunc(ConvertStringToCsv))
+}
+
 func ConvertBytesToBase64(in interface{}, out *interface{}) error {
 	*out = base64.StdEncoding.EncodeToString(in.([]byte))
 	return nil

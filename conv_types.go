@@ -2,6 +2,15 @@ package converter
 
 import "strconv"
 
+func init() {
+	RegisterConverter(NewConverter("bytes-to-string").SetTypes("[]byte", "string").SetConversionFunc(ConvertBytesToString).SetDefaultTypeConverter())
+	RegisterConverter(NewConverter("string-to-bytes").SetTypes("string", "[]byte").SetConversionFunc(ConvertStringToBytes).SetDefaultTypeConverter())
+	RegisterConverter(NewConverter("int-to-string").SetTypes("int", "string").SetConversionFunc(ConvertIntegerToString).SetDefaultTypeConverter())
+	RegisterConverter(NewConverter("string-to-int").SetTypes("string", "int").SetConversionFunc(ConvertStringToInteger).SetDefaultTypeConverter())
+	RegisterConverter(NewConverter("string-to-float").SetTypes("string", "float64").SetConversionFunc(ConvertStringToFloat).SetDefaultTypeConverter())
+	RegisterConverter(NewConverter("float-to-string").SetTypes("float64", "string").SetConversionFunc(ConvertFloatToString).SetDefaultTypeConverter())
+}
+
 func ConvertBytesToString(in interface{}, out *interface{}) error {
 	*out = string(in.([]byte))
 	return nil

@@ -6,6 +6,16 @@ import (
 	"time"
 )
 
+func init() {
+	RegisterConverter(NewConverter("fetch").SetTypes("string", "[]byte").SetConversionFunc(FetchUrlToBytes))
+	RegisterConverter(NewConverter("sleep-100ms").SetConversionFunc(HundredMillisecondDelayer))
+	RegisterConverter(NewConverter("sleep-1s").SetConversionFunc(OneSecondDelayer))
+	RegisterConverter(NewConverter("sleep-2s").SetConversionFunc(TwoSecondDelayer))
+	RegisterConverter(NewConverter("sleep-5s").SetConversionFunc(FiveSecondDelayer))
+	RegisterConverter(NewConverter("sleep-10s").SetConversionFunc(TenSecondDelayer))
+	RegisterConverter(NewConverter("sleep-1m").SetConversionFunc(OneMinuteDelayer))
+}
+
 func Delayer(duration time.Duration) ConversionFn {
 	return func(in interface{}, out *interface{}) error {
 		time.Sleep(duration)

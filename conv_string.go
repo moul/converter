@@ -5,6 +5,13 @@ import (
 	"strings"
 )
 
+func init() {
+	RegisterConverter(NewConverter("reverse").SetType("string").SetConversionFunc(ReverseString))
+	RegisterConverter(NewConverter("upper").SetType("string").SetConversionFunc(Uppercase))
+	RegisterConverter(NewConverter("lower").SetType("string").SetConversionFunc(Lowercase))
+	RegisterConverter(NewConverter("split-lines").SetType("[]byte").SetStreamConvFunc(StreamBufferSplitLines))
+}
+
 func ReverseString(in interface{}, out *interface{}) (err error) {
 	runes := []rune(in.(string))
 	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
