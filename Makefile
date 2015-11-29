@@ -1,3 +1,15 @@
+SOURCES := $(shell find . -name "*.go")
+
+
+.PHONY: build
+build: json2toml converter
+
+
+json2toml converter: $(SOURCES)
+	go get ./...
+	go build -o $@ ./cmd/$@
+
+
 .PHONY: test
 test:
 	go get -t ./...
