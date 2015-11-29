@@ -22,19 +22,53 @@ func NewConverterChain(filterNames []string) (ConverterChain, error) {
 	return chain, nil
 }
 
-func (chain *ConverterChain) ConversionFunc() ConversionFn {
+func GetTypeConversionFunc(inType, outType string) ConversionFn {
+	if inType == outType {
+		return nil
+	}
+	if inType == "interface{}" || outType == "interface{}" {
+		return nil
+	}
+
+	for _, converter := range RegisteredConverters {
+		if converter.InputType == inType && converter.OutputType == outType && converter.IsDefaultTypeConverter {
+			return converter.ConversionFunc
+		}
+	}
+	return nil
+}
+
+func (chain *ConverterChain) ConversionFunc(inType, outType string) (ConversionFn, error) {
+	if len(*chain) == 0 {
+		return nil, fmt.Errorf("you should have at least one converter")
+	}
+
 	fn := (*chain)[0].ConversionFunc
+	if convertFn := GetTypeConversionFunc(inType, (*chain)[0].InputType); convertFn != nil {
+		fn = Pipe(convertFn, fn)
+	}
+
 	if len(*chain) == 1 {
-		return fn
+		return fn, nil
 	}
+
+	inType = (*chain)[0].OutputType
 	for _, right := range (*chain)[1:] {
+		if convertFn := GetTypeConversionFunc(inType, right.InputType); convertFn != nil {
+			fn = Pipe(fn, convertFn)
+		}
 		fn = Pipe(fn, right.ConversionFunc)
+		inType = right.OutputType
 	}
-	return fn
+	return fn, nil
 }
 
 func (chain *ConverterChain) Convert(input interface{}, output *interface{}) error {
-	return chain.ConversionFunc()(input, output)
+	fn, err := chain.ConversionFunc("interface{}", "interface{}")
+	if err != nil {
+		return err
+	}
+	return fn(input, output)
 }
 
 func GetConverterByName(name string) (*Converter, error) {

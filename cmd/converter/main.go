@@ -32,8 +32,13 @@ func main() {
 		logrus.Fatalf("Failed to read from stdin: %v", err)
 	}
 
+	conversionFunc, err := chain.ConversionFunc("[]byte", "interface{}")
+	if err != nil {
+		logrus.Fatalf("Failed to generate a conversion func: %v", err)
+	}
+
 	var output interface{}
-	if err = chain.Convert(input, &output); err != nil {
+	if err = conversionFunc(input, &output); err != nil {
 		logrus.Fatalf("Failed to convert from json to toml: %v", err)
 	}
 
