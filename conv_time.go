@@ -1,6 +1,9 @@
 package converter
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 func init() {
 	RegisterConverter(NewConverter("to-unix").SetTypes("time.Time", "int64").SetConversionFunc(ConvertTimeToUnix))
@@ -14,7 +17,7 @@ func init() {
 
 func DateToTimeConverter(format string) ConversionFn {
 	return func(in interface{}, out *interface{}) (err error) {
-		*out, err = time.Parse(format, in.(string))
+		*out, err = time.Parse(format, strings.TrimSpace(in.(string)))
 		return err
 	}
 }

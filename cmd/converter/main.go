@@ -39,7 +39,7 @@ func main() {
 
 	var output interface{}
 	if err = conversionFunc(input, &output); err != nil {
-		logrus.Fatalf("Failed to convert from json to toml: %v", err)
+		logrus.Fatalf("Failed to convert: %v", err)
 	}
 
 	fmt.Printf("%v\n", output)

@@ -25,3 +25,8 @@ cover:
 .PHONY: convey
 convey:
 	goconvey -cover -port=10042 -workDir="$(realpath .)" -depth=1
+
+
+.PHONY: install
+install:
+	go install ./cmd/converter
