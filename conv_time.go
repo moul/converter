@@ -13,6 +13,7 @@ func init() {
 	RegisterConverter(NewConverter("parse-rfc850-date").SetTypes("string", "time.Time").SetConversionFunc(ConvertRFC850ToTime))
 	RegisterConverter(NewConverter("parse-rfc1123-date").SetTypes("string", "time.Time").SetConversionFunc(ConvertRFC1123ToTime))
 	RegisterConverter(NewConverter("parse-unix-date").SetTypes("string", "time.Time").SetConversionFunc(ConvertUnixDateToTime))
+	RegisterConverter(NewConverter("parse-date").SetTypes("string", "time.Time").SetConversionFunc(ConvertDateToTime).SetDefaultTypeConverter())
 	RegisterConverter(NewConverter("time-to-string").SetTypes("time.Time", "string").SetConversionFunc(ConvertTimeToString).SetDefaultTypeConverter())
 	RegisterConverter(NewConverter("parse-unix-timestamp").SetTypes("int64", "time.Time").SetConversionFunc(ConvertUnixTimestampToTime))
 }
@@ -38,6 +39,20 @@ func ConvertTimeToUnix(in interface{}, out *interface{}) (err error) {
 
 func ConvertTimeToString(in interface{}, out *interface{}) (err error) {
 	*out = in.(time.Time).String()
+	return err
+}
+
+func ConvertDateToTime(in interface{}, out *interface{}) (err error) {
+	input := strings.TrimSpace(in.(string))
+	formats := []string{
+		time.ANSIC, time.RFC3339, time.RFC822, time.RFC850, time.RFC1123, time.UnixDate,
+	}
+	for _, format := range formats {
+		if *out, err = time.Parse(format, input); err == nil {
+			return nil
+		}
+	}
+	*out = nil
 	return err
 }
 
