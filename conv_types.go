@@ -1,12 +1,15 @@
 package converter
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 func init() {
 	RegisterConverter(NewConverter("bytes-to-string").SetTypes("[]byte", "string").SetConversionFunc(ConvertBytesToString).SetDefaultTypeConverter())
 	RegisterConverter(NewConverter("string-to-bytes").SetTypes("string", "[]byte").SetConversionFunc(ConvertStringToBytes).SetDefaultTypeConverter())
-	RegisterConverter(NewConverter("int-to-string").SetTypes("int", "string").SetConversionFunc(ConvertIntegerToString).SetDefaultTypeConverter())
-	RegisterConverter(NewConverter("string-to-int").SetTypes("string", "int").SetConversionFunc(ConvertStringToInteger).SetDefaultTypeConverter())
+	RegisterConverter(NewConverter("int-to-string").SetTypes("int64", "string").SetConversionFunc(ConvertIntegerToString).SetDefaultTypeConverter())
+	RegisterConverter(NewConverter("string-to-int").SetTypes("string", "int64").SetConversionFunc(ConvertStringToInteger).SetDefaultTypeConverter())
 	RegisterConverter(NewConverter("string-to-float").SetTypes("string", "float64").SetConversionFunc(ConvertStringToFloat).SetDefaultTypeConverter())
 	RegisterConverter(NewConverter("float-to-string").SetTypes("float64", "string").SetConversionFunc(ConvertFloatToString).SetDefaultTypeConverter())
 }
@@ -22,17 +25,17 @@ func ConvertStringToBytes(in interface{}, out *interface{}) error {
 }
 
 func ConvertIntegerToString(in interface{}, out *interface{}) error {
-	*out = strconv.Itoa(in.(int))
+	*out = strconv.FormatInt(in.(int64), 10)
 	return nil
 }
 
 func ConvertStringToInteger(in interface{}, out *interface{}) (err error) {
-	*out, err = strconv.Atoi(in.(string))
+	*out, err = strconv.ParseInt(strings.TrimSpace(in.(string)), 10, 0)
 	return err
 }
 
 func ConvertStringToFloat(in interface{}, out *interface{}) (err error) {
-	*out, err = strconv.ParseFloat(in.(string), 64)
+	*out, err = strconv.ParseFloat(strings.TrimSpace(in.(string)), 64)
 	return err
 }
 

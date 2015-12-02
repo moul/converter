@@ -43,7 +43,7 @@ func ExampleConvertStringToBytes() {
 
 func TestConvertIntegerToString(t *testing.T) {
 	Convey("Testing ConvertIntegerToString", t, func() {
-		input := 1234567890
+		input := int64(1234567890)
 		var output interface{}
 		err := ConvertIntegerToString(input, &output)
 		So(err, ShouldBeNil)
@@ -53,7 +53,7 @@ func TestConvertIntegerToString(t *testing.T) {
 
 func ExampleConvertIntegerToString() {
 	var output interface{}
-	ConvertIntegerToString(1234567890, &output)
+	ConvertIntegerToString(int64(1234567890), &output)
 	fmt.Println(output)
 	// Output: 1234567890
 }
