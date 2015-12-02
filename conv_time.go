@@ -14,6 +14,7 @@ func init() {
 	RegisterConverter(NewConverter("parse-rfc1123-date").SetTypes("string", "time.Time").SetConversionFunc(ConvertRFC1123ToTime))
 	RegisterConverter(NewConverter("parse-unix-date").SetTypes("string", "time.Time").SetConversionFunc(ConvertUnixDateToTime))
 	RegisterConverter(NewConverter("time-to-string").SetTypes("time.Time", "string").SetConversionFunc(ConvertTimeToString).SetDefaultTypeConverter())
+	RegisterConverter(NewConverter("parse-unix-timestamp").SetTypes("int64", "time.Time").SetConversionFunc(ConvertUnixTimestampToTime))
 }
 
 func DateToTimeConverter(format string) ConversionFn {
@@ -38,4 +39,9 @@ func ConvertTimeToUnix(in interface{}, out *interface{}) (err error) {
 func ConvertTimeToString(in interface{}, out *interface{}) (err error) {
 	*out = in.(time.Time).String()
 	return err
+}
+
+func ConvertUnixTimestampToTime(in interface{}, out *interface{}) (err error) {
+	*out = time.Unix(in.(int64), 0)
+	return nil
 }
