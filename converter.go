@@ -43,6 +43,8 @@ func (chain *ConverterChain) ConversionFunc(inType, outType string) (ConversionF
 		return nil, fmt.Errorf("you should have at least one converter")
 	}
 
+	lastRealInType := inType
+
 	fn := (*chain)[0].ConversionFunc
 	if convertFn := GetTypeConversionFunc(inType, (*chain)[0].InputType); convertFn != nil {
 		fn = Pipe(convertFn, fn)
@@ -54,7 +56,10 @@ func (chain *ConverterChain) ConversionFunc(inType, outType string) (ConversionF
 
 	inType = (*chain)[0].OutputType
 	for _, right := range (*chain)[1:] {
-		if convertFn := GetTypeConversionFunc(inType, right.InputType); convertFn != nil {
+		if inType != "interface{}" {
+			lastRealInType = inType
+		}
+		if convertFn := GetTypeConversionFunc(lastRealInType, right.InputType); convertFn != nil {
 			fn = Pipe(fn, convertFn)
 		}
 		fn = Pipe(fn, right.ConversionFunc)
