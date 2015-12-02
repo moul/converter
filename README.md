@@ -73,6 +73,59 @@ $ echo 'Hello World!' | converter reverse md5 upper reverse base64-decode bytes-
 
 See [GoDoc](https://godoc.org/github.com/moul/converter) for usage and examples.
 
+## Changelog
+
+### v1.0.0 (2015-12-02)
+
+* First release
+* Chaining support
+* Pipe support
+* Basic streaming support
+* Helper to convert a basic converter to streaming converter
+* Automtically detect intermediary converters if needed
+* Available filters:
+  * base32-decode
+  * base32-encode
+  * base64-decode
+  * base64-encode
+  * bytes-to-string
+  * csv-decode
+  * fetch
+  * float-to-string
+  * hex-decode
+  * hex-encode
+  * int-to-string
+  * json-decode
+  * json-encode
+  * lower
+  * md5
+  * parse-ansi-date
+  * parse-date
+  * parse-rfc1123-date
+  * parse-rfc339-date
+  * parse-rfc822-date
+  * parse-rfc850-date
+  * parse-unix-date
+  * parse-unix-timestamp
+  * reverse
+  * sha1
+  * sleep-100ms
+  * sleep-10s
+  * sleep-1m
+  * sleep-1s
+  * sleep-2s
+  * sleep-5s
+  * split-lines
+  * string-to-bytes
+  * string-to-float
+  * string-to-int
+  * time-to-string
+  * to-unix
+  * toml-encode
+  * upper
+  * xml-decode
+  * xml-encode
+
 ## License
 
 MIT
