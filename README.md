@@ -75,6 +75,10 @@ See [GoDoc](https://godoc.org/github.com/moul/converter) for usage and examples.
 
 ## Changelog
 
+### master (unreleased)
+
+* No entry
+
 ### v1.0.0 (2015-12-02)
 
 * First release
