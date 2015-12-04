@@ -1,9 +1,15 @@
 VERSION :=	$(shell cat .goxc.json | jq -c .PackageVersion | sed 's/"//g')
 SOURCES :=	$(shell find . -name "*.go")
 GOENV ?=	GO15VENDOREXPERIMENT=1
+LOCAL_PKGS ?=	$(shell go list ./... | grep -v /vendor/)
+VERSION :=	$(shell cat .goxc.json | grep "PackageVersion" | egrep -o "([0-9]{1,}\.)+[0-9]{1,}")
+REV :=		$(shell git rev-parse HEAD || git ls-remote https://github.com/scaleway/scaleway-cli  | grep -F $(VERSION) | head -n1 | awk '{print $$1}' || echo "nogit")
+TAG :=		$(shell git describe --tags --always || echo $(VERSION) || echo "nogit")
+LDFLAGS =	"-X main.GITCOMMIT=$(TAG) \
+		-X main.VERSION=$(VERSION) \
+		-X main.BUILD_DATE=$(date +%s)"
 GO ?=		$(GOENV) go
 GODEP ?=	$(GOENV) godep
-LOCAL_PKGS ?=	$(shell go list ./... | grep -v /vendor/)
 
 
 .PHONY: build
@@ -11,14 +17,14 @@ build: json2toml converter
 
 
 json2toml converter: $(SOURCES)
-	$(GO) build -o $@ ./cmd/$@
+	$(GO) build -ldflags $(LDFLAGS) -o $@ ./cmd/$@
 
 
 .PHONY: test
 test:
 	$(GODEP) restore
 	$(GO) get -t .
-	$(GO) test -v .
+	$(GO) test  -ldflags $(LDFLAGS) -v .
 
 
 .PHONY: godep-save
@@ -29,7 +35,7 @@ godep-save:
 .PHONY: cover
 cover:
 	rm -f profile.out
-	$(GO) test -covermode=count -coverpkg=. -coverprofile=profile.out .
+	$(GO) test -ldflags $(LDFLAGS) -covermode=count -coverpkg=. -coverprofile=profile.out .
 
 
 .PHONY: convey

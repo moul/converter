@@ -6,15 +6,42 @@ import (
 	"os"
 
 	"github.com/Sirupsen/logrus"
+	"github.com/codegangsta/cli"
 	. "github.com/moul/converter"
 )
 
+var (
+	VERSION   string
+	GITCOMMIT string
+)
+
 func main() {
-	if len(os.Args) < 2 {
-		logrus.Fatalf("Usage: './converter --list-filters' or './converter <filter> [filter...]'")
+	app := cli.NewApp()
+	app.Name = "converter"
+	app.Author = "Manfred Touron"
+	app.Email = "https://github.com/moul/converter"
+	app.Version = VERSION + " (" + GITCOMMIT + ")"
+
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "list-filters",
+			Usage: "List available filters",
+		},
 	}
 
-	if os.Args[1] == "--list-filters" {
+	app.Before = hookBefore
+	app.Action = Action
+
+	app.Run(os.Args)
+}
+
+func hookBefore(c *cli.Context) error {
+	// configure logrus
+	return nil
+}
+
+func Action(c *cli.Context) {
+	if c.Bool("list-filters") {
 		fmt.Println("Available filters:")
 		for _, filter := range RegisteredConverters {
 			fmt.Printf("- %s\n", filter.Name)
@@ -22,7 +49,12 @@ func main() {
 		return
 	}
 
-	chain, err := NewConverterChain(os.Args[1:])
+	args := c.Args()
+	if len(args) == 0 {
+		logrus.Fatalf("You need to use at least one filter")
+	}
+
+	chain, err := NewConverterChain(args)
 	if err != nil {
 		logrus.Fatalf("Failed to create a converter: %v", err)
 	}
