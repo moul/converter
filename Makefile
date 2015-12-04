@@ -1,5 +1,9 @@
 VERSION :=	$(shell cat .goxc.json | jq -c .PackageVersion | sed 's/"//g')
 SOURCES :=	$(shell find . -name "*.go")
+GOENV ?=	GO15VENDOREXPERIMENT=1
+GO ?=		$(GOENV) go
+GODEP ?=	$(GOENV) godep
+LOCAL_PKGS ?=	$(shell go list ./... | grep -v /vendor/)
 
 
 .PHONY: build
@@ -7,30 +11,37 @@ build: json2toml converter
 
 
 json2toml converter: $(SOURCES)
-	go get ./...
-	go build -o $@ ./cmd/$@
+	$(GO) get ./...
+	$(GO) build -o $@ ./cmd/$@
 
 
 .PHONY: test
 test:
-	go get -t ./...
-	go test -v ./...
+	$(GODEP) restore
+	$(GO) get -t .
+	$(GO) test -v .
+
+
+.PHONY: godep-save
+godep-save:
+	$(GODEP) save $(LOCAL_PKGS)
 
 
 .PHONY: cover
 cover:
 	rm -f profile.out
-	go test -covermode=count -coverpkg=. -coverprofile=profile.out .
+	$(GO) test -covermode=count -coverpkg=. -coverprofile=profile.out .
 
 
 .PHONY: convey
 convey:
+	$(GO) get github.com/smartystreets/goconvey
 	goconvey -cover -port=10042 -workDir="$(realpath .)" -depth=1
 
 
 .PHONY: install
 install:
-	go install ./cmd/converter
+	$(GO) install ./cmd/converter
 
 
 .PHONY: build-docker
