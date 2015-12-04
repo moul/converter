@@ -21,6 +21,8 @@ func main() {
 	app.Author = "Manfred Touron"
 	app.Email = "https://github.com/moul/converter"
 	app.Version = VERSION + " (" + GITCOMMIT + ")"
+	app.EnableBashCompletion = true
+	app.BashComplete = BashComplete
 
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
@@ -33,6 +35,15 @@ func main() {
 	app.Action = Action
 
 	app.Run(os.Args)
+}
+
+func BashComplete(c *cli.Context) {
+	if len(c.Args()) == 0 {
+		fmt.Println("--list-filters")
+	}
+	for _, filter := range RegisteredConverters {
+		fmt.Println(filter.Name)
+	}
 }
 
 func hookBefore(c *cli.Context) error {
@@ -52,6 +63,12 @@ func Action(c *cli.Context) {
 	args := c.Args()
 	if len(args) == 0 {
 		logrus.Fatalf("You need to use at least one filter")
+	}
+
+	for _, arg := range args {
+		if arg == "--generate-bash-completion" {
+			return
+		}
 	}
 
 	chain, err := NewConverterChain(args)

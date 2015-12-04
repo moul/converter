@@ -25,7 +25,8 @@ class Converter < Formula
     system "go", "build", "-o", "converter", "./cmd/converter"
     bin.install "converter"
 
-    # FIXME: add autocompletion
+    bash_completion.install "contrib/completion/bash_autocomplete"
+    zsh_completion.install "contrib/completion/zsh_autocomplete"
   end
 
   test do
