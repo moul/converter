@@ -1,3 +1,6 @@
+contrib/docker/.docker-container-built
+contrib/docker/converter
+
 profile.out
 /converter
 /json2toml

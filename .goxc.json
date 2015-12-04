@@ -1,7 +1,7 @@
 {
 	"AppName": "converter",
 	"ArtifactsDest": "dist",
-	"OutPath": "{{.Dest}}{{.PS}}{{.Version}}{{.PS}}{{.Os}}_{{.Arch}}{{.PS}}{{.ExeName}}{{.Ext}}",
+        "OutPath": "{{.Dest}}{{.PS}}{{.Version}}{{.PS}}{{.ExeName}}_{{.Version}}_{{.Os}}_{{.Arch}}{{.Ext}}",
 	"TasksExclude": [
 		"go-test",
 		"go-vet"
