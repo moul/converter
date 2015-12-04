@@ -11,7 +11,6 @@ build: json2toml converter
 
 
 json2toml converter: $(SOURCES)
-	$(GO) get ./...
 	$(GO) build -o $@ ./cmd/$@
 
 
