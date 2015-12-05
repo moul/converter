@@ -69,6 +69,13 @@ $ echo 'Hello World!' | converter reverse md5 upper reverse base64-decode bytes-
 ۡ<���B�@x�}z�n@�0|@�
 ```
 
+## Using with Docker
+
+```console
+$ date | docker run --rm moul/converter md5 sha1
+67a74306b06d0c01624fe0d0249a570f4d093747
+```
+
 ## Using as a Golang library
 
 See [GoDoc](https://godoc.org/github.com/moul/converter) for usage and examples.
