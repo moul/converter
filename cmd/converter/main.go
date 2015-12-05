@@ -22,25 +22,24 @@ func main() {
 	app.Email = "https://github.com/moul/converter"
 	app.Version = VERSION + " (" + GITCOMMIT + ")"
 	app.EnableBashCompletion = true
-	app.BashComplete = BashComplete
-
-	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:  "list-filters",
-			Usage: "List available filters",
-		},
-	}
 
 	app.Before = hookBefore
-	app.Action = Action
+
+	app.Commands = []cli.Command{}
+	for _, filter := range RegisteredConverters {
+		command := cli.Command{
+			Name:         filter.Name,
+			Usage:        fmt.Sprintf("%s  ->  %s", filter.InputType, filter.OutputType),
+			Action:       Action,
+			BashComplete: BashComplete,
+		}
+		app.Commands = append(app.Commands, command)
+	}
 
 	app.Run(os.Args)
 }
 
 func BashComplete(c *cli.Context) {
-	if len(c.Args()) == 0 {
-		fmt.Println("--list-filters")
-	}
 	for _, filter := range RegisteredConverters {
 		fmt.Println(filter.Name)
 	}
@@ -52,23 +51,9 @@ func hookBefore(c *cli.Context) error {
 }
 
 func Action(c *cli.Context) {
-	if c.Bool("list-filters") {
-		fmt.Println("Available filters:")
-		for _, filter := range RegisteredConverters {
-			fmt.Printf("- %s\n", filter.Name)
-		}
-		return
-	}
-
-	args := c.Args()
+	args := append([]string{c.Command.Name}, c.Args()...)
 	if len(args) == 0 {
 		logrus.Fatalf("You need to use at least one filter")
-	}
-
-	for _, arg := range args {
-		if arg == "--generate-bash-completion" {
-			return
-		}
 	}
 
 	chain, err := NewConverterChain(args)
