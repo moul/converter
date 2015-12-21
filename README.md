@@ -137,6 +137,10 @@ See [GoDoc](https://godoc.org/github.com/moul/converter) for usage and examples.
   * xml-decode
   * xml-encode
 
+## Credit
+
+This project is inspired by the [transformer](https://github.com/jbenet/transformer/) by the venerable [Juan Benet](https://github.com/jbenet)
+
 ## License
 
 MIT
