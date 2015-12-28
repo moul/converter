@@ -5,6 +5,8 @@
 [![GoDoc](https://godoc.org/github.com/moul/converter?status.svg)](https://godoc.org/github.com/moul/converter)
 [![Coverage Status](https://coveralls.io/repos/moul/converter/badge.svg?branch=master&service=github)](https://coveralls.io/github/moul/converter?branch=master)
 
+![](https://raw.githubusercontent.com/moul/converter/master/assets/dictionary.png)
+
 ## Usage
 
 `converter` can be used in the CLI as follow:
