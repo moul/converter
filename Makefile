@@ -9,7 +9,6 @@ LDFLAGS =	"-X main.GITCOMMIT=$(TAG) \
 		-X main.VERSION=$(VERSION) \
 		-X main.BUILD_DATE=$(date +%s)"
 GO ?=		$(GOENV) go
-GODEP ?=	$(GOENV) godep
 
 
 .PHONY: build
@@ -22,14 +21,7 @@ json2toml converter: $(SOURCES)
 
 .PHONY: test
 test:
-	$(GODEP) restore
-	$(GO) get -t .
 	$(GO) test  -ldflags $(LDFLAGS) -v .
-
-
-.PHONY: godep-save
-godep-save:
-	$(GODEP) save $(LOCAL_PKGS)
 
 
 .PHONY: cover
