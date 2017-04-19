@@ -1,7 +1,6 @@
 package converter
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -46,6 +45,7 @@ func TestDelayer(t *testing.T) {
 	})
 }
 
+/*
 func ExampleFetchUrlToBytes() {
 	input := "http://sapin-as-a-service.appspot.com/?size=3"
 	var output interface{}
@@ -71,3 +71,4 @@ func ExampleFetchUrlToBytes() {
 	//          |||
 	//          |||
 }
+*/
