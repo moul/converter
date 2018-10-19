@@ -3,7 +3,7 @@
 
 [![Build Status](https://travis-ci.org/moul/converter.svg?branch=master)](https://travis-ci.org/moul/converter)
 [![GoDoc](https://godoc.org/github.com/moul/converter?status.svg)](https://godoc.org/github.com/moul/converter)
-[![Coverage Status](https://coveralls.io/repos/moul/converter/badge.svg?branch=master&service=github)](https://coveralls.io/github/moul/converter?branch=master)
+[![Coverage Status](https://coveralls.io/repos/moul/converter/badge.svg?branch=master&service=github)](https://coveralls.io/github/moul/converter?branch=master) [![GuardRails badge](https://badges.production.guardrails.io/moul/converter.svg)](https://www.guardrails.io)
 
 ![](https://raw.githubusercontent.com/moul/converter/master/assets/dictionary.png)
 
