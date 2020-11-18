@@ -1,141 +1,60 @@
-package converter
+package converter_test
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/stretchr/testify/require"
+	"moul.io/converter"
 )
 
-func Test_manual_chaining(t *testing.T) {
-	Convey("Testing chaining", t, func() {
-		input := "hello world!"
-		var output1 interface{}
-		var err error
+func TestConverter(t *testing.T) {
+	cases := []struct {
+		input          interface{}
+		converters     []string
+		expectedOutput interface{}
+		expectedError  bool
+	}{
+		{"hello world", []string{"rev"}, "dlrow olleh", false},
+		{"hello world", []string{"upper"}, "HELLO WORLD", false},
+		{"HELLO WORLD", []string{"lower"}, "hello world", false},
+		{"hello world", []string{"title"}, "Hello World", false},
+		{"42", []string{"_string-to-int64"}, int64(42), false},
+		{"42", []string{"_string-to-float64"}, float64(42), false},
+		{"42.42", []string{"_string-to-int64"}, nil, true},
+		{"42.42", []string{"_string-to-float64"}, float64(42.42), false},
+		{int64(42), []string{"_int64-to-string"}, "42", false},
+		{float64(42), []string{"_float64-to-string"}, "42", false},
+		{float64(42.5), []string{"_float64-to-string"}, "42.5", false},
+		{"hello world", []string{"_parse-string"}, "hello world", false},
+		{"42", []string{"_parse-string"}, int64(42), false},
+		{"42.42", []string{"_parse-string"}, float64(42.42), false},
+		{"hello world", []string{"rev", "rev"}, "hello world", false},
+		{"hello world", []string{"rev", "upper"}, "DLROW OLLEH", false},
+		{"hello world", []string{"upper", "rev"}, "DLROW OLLEH", false},
+	}
 
-		err = ConvertStringToBytes(input, &output1)
-		So(err, ShouldBeNil)
-		So(output1, ShouldResemble, []byte("hello world!"))
+	for _, tc := range cases {
+		name := fmt.Sprintf("%v_%s", tc.input, strings.Join(tc.converters, ","))
+		t.Run(name, func(t *testing.T) {
+			fn, err := converter.ChainFunc(tc.converters)
+			require.NoError(t, err)
+			require.NotNil(t, fn)
 
-		var output2 interface{}
-		err = ConvertBytesToHex(output1, &output2)
-		So(err, ShouldBeNil)
-		So(output2, ShouldEqual, "68656c6c6f20776f726c6421")
-
-		var output3 interface{}
-		err = ConvertHexToBytes(output2, &output3)
-		So(err, ShouldBeNil)
-		So(output3, ShouldResemble, []byte("hello world!"))
-
-		var output4 interface{}
-		err = ConvertBytesToString(output3, &output4)
-		So(err, ShouldBeNil)
-		So(output4, ShouldEqual, input)
-	})
-}
-
-func TestPipe(t *testing.T) {
-	Convey("Testing Pipe", t, func() {
-		Convey(`string("hello world!") | ConvertStringToBytes | ConvertBytesToBase64`, func() {
-			input := "hello world!"
-			var output interface{}
-
-			pipeFunc := Pipe(ConvertStringToBytes, ConvertBytesToBase64)
-			err := pipeFunc(input, &output)
-			So(err, ShouldBeNil)
-			So(output, ShouldEqual, "aGVsbG8gd29ybGQh")
+			ret, err := fn(tc.input)
+			if tc.expectedError {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedOutput, ret)
+			}
 		})
-	})
+	}
 }
 
-func TestChain(t *testing.T) {
-	Convey("Testing Chain", t, func() {
-		Convey(`float64(3.1415) | ConvertFloatToString | ConvertStringToBytes | ConvertBytesToBase64 | ConvertStringToBytes | ConvertBytesToBase32`, func() {
-			input := 3.1415
-			var output interface{}
-
-			chainFunc := Chain(ConvertFloatToString, ConvertStringToBytes, ConvertBytesToBase64, ConvertStringToBytes, ConvertBytesToBase32)
-
-			err := chainFunc(input, &output)
-			So(err, ShouldBeNil)
-			So(output, ShouldEqual, "JV4TI6COIRCTC===")
-		})
-
-		/*
-					Convey(``, func() {
-						input := "http://manfred-touron.appspot.com"
-						var output interface{}
-
-						chainFunc := Chain(FetchUrlToBytes, ConvertJsonToStruct, ConvertStructToToml, ConvertBytesToString)
-
-						err := chainFunc(input, &output)
-						So(err, ShouldBeNil)
-						So(output, ShouldEqual, `emoji = "👌"
-			firstname = "Manfred"
-			github = "https://github.com/moul"
-			headline = "For passion, madness and glory"
-			lastname = "Touron"
-			location = "Rouen, France / Paris, France"
-			twitter = "https://twitter.com/moul"
-			website = "http://m.42.am/"
-			`)
-					})
-		*/
-	})
-}
-
-func TestConversionToStreamConv(t *testing.T) {
-	Convey("Testing ConversionToStreamConv", t, func() {
-		streamFn := ConversionToStreamConv(ConvertStringToBytes)
-		in := make(chan interface{}, 10)
-		out := streamFn(in)
-
-		in <- "hello world!"
-		in <- "HELLO WORLD!"
-		in <- "HeLlO wOrLd!"
-		So(<-out, ShouldResemble, []byte("hello world!"))
-		So(<-out, ShouldResemble, []byte("HELLO WORLD!"))
-		So(<-out, ShouldResemble, []byte("HeLlO wOrLd!"))
-		// select {
-		// case _, ok := <-out:
-		// 	So(ok, ShouldBeFalse)
-		// }
-	})
-}
-
-func TestStreamPipe(t *testing.T) {
-	Convey("Testing StreamPipe", t, func() {
-		streamPipe := StreamPipe(ConversionToStreamConv(ConvertStringToBytes), ConversionToStreamConv(ConvertBytesToBase64))
-		in := make(chan interface{}, 10)
-		out := streamPipe(in)
-
-		in <- "hello world!"
-		in <- "HELLO WORLD!"
-		in <- "HeLlO wOrLd!"
-		So(<-out, ShouldEqual, "aGVsbG8gd29ybGQh")
-		So(<-out, ShouldEqual, "SEVMTE8gV09STEQh")
-		So(<-out, ShouldEqual, "SGVMbE8gd09yTGQh")
-		// select {
-		// case _, ok := <-out:
-		// 	So(ok, ShouldBeFalse)
-		// }
-	})
-}
-
-func TestStreamChain(t *testing.T) {
-	Convey("Testing StreamChain", t, func() {
-		streamChain := StreamChain(ConversionToStreamConv(ConvertFloatToString), ConversionToStreamConv(ConvertStringToBytes), ConversionToStreamConv(ConvertBytesToBase64), ConversionToStreamConv(ConvertStringToBytes), ConversionToStreamConv(ConvertBytesToBase32))
-		in := make(chan interface{}, 10)
-		out := streamChain(in)
-
-		in <- 3.1415
-		in <- 4242.4242
-		in <- -123456789.987654321
-		So(<-out, ShouldEqual, "JV4TI6COIRCTC===")
-		So(<-out, ShouldEqual, "JZCESMCNNE2DATLKKF4Q====")
-		So(<-out, ShouldEqual, "JRKEK6KNPJITCTTKMM2E6UZUGVHUIYZSJZKFC6SNO46T2===")
-		// select {
-		// case _, ok := <-out:
-		// 	So(ok, ShouldBeFalse)
-		// }
-	})
+func Example() {
+	ret, _ := converter.Chain("hello world", []string{"rev", "upper"})
+	fmt.Println(ret)
+	// Output: DLROW OLLEH
 }

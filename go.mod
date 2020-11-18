@@ -7,5 +7,6 @@ require (
 	github.com/mr-tron/base58 v1.2.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/smartystreets/goconvey v1.6.4
+	github.com/stretchr/testify v1.2.2
 	github.com/urfave/cli v1.22.5
 )

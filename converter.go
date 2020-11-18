@@ -1,190 +1,132 @@
 package converter
 
 import (
-	"errors"
 	"fmt"
+	"reflect"
+	"strconv"
+	"strings"
 )
 
-type (
-	ConversionFn func(interface{}, *interface{}) error
-	StreamConvFn func(chan interface{}) chan interface{}
-	Flow         []*Converter
-)
+var Converters = map[string]interface{}{
+	"rev":   rev,
+	"upper": strings.ToUpper,
+	"lower": strings.ToLower,
+	"title": strings.Title,
 
-var ErrMinOneFilter = errors.New("you should have at least one filter")
+	// internal
+	"_parse-string":      parseString,
+	"_bytes-to-string":   func(in []byte) string { return string(in) },
+	"_string-to-bytes":   func(in string) []byte { return []byte(in) },
+	"_int64-to-string":   func(in int64) string { return strconv.FormatInt(in, 10) },
+	"_string-to-int64":   func(in string) (int64, error) { return strconv.ParseInt(strings.TrimSpace(in), 10, 0) },
+	"_string-to-float64": func(in string) (float64, error) { return strconv.ParseFloat(strings.TrimSpace(in), 64) },
+	"_float64-to-string": func(in float64) string { return strconv.FormatFloat(in, 'f', -1, 64) },
+}
 
-func NewFlow(filterNames []string) (Flow, error) {
-	if len(filterNames) == 0 {
-		return nil, ErrMinOneFilter
+type Func func(interface{}) (interface{}, error)
+
+func Chain(input interface{}, converters []string) (interface{}, error) {
+	fn, err := ChainFunc(converters)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build chain func: %w", err)
 	}
-	flow := Flow{}
-	for _, name := range filterNames {
-		converter, err := GetConverterByName(name)
+
+	return fn(input)
+}
+
+func ChainFunc(converters []string) (Func, error) {
+	if len(converters) == 0 {
+		return func(input interface{}) (interface{}, error) {
+			return input, nil
+		}, nil
+	}
+
+	var ret Func
+
+	for _, name := range converters {
+		converter, found := Converters[name]
+		if !found {
+			return nil, fmt.Errorf("no such converter with name %q", name)
+		}
+
+		fn, err := converterToFunc(converter)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"invalid converter signature %q: %w",
+				reflect.TypeOf(converter).String(),
+				err,
+			)
+		}
+
+		ret = bridgeFuncs(ret, fn)
+	}
+
+	return ret, nil
+}
+
+func bridgeFuncs(left, right Func) Func {
+	if left == nil {
+		return right
+	}
+	return func(input interface{}) (interface{}, error) {
+		ret, err := left(input)
 		if err != nil {
 			return nil, err
 		}
-		flow = append(flow, converter)
+		return right(ret)
 	}
-	return flow, nil
 }
 
-func GetTypeConversionFunc(inType, outType string) ConversionFn {
-	if inType == outType {
-		return nil
+func converterToFunc(converter interface{}) (Func, error) {
+	x := reflect.TypeOf(converter)
+	// 1 input parameter, 1 or 2 output parameters
+	if x.NumIn() != 1 || x.NumOut() < 1 || x.NumOut() > 2 || x.IsVariadic() {
+		return nil, fmt.Errorf("invalid amount of parameters")
 	}
-	if inType == "interface{}" || outType == "interface{}" {
-		return nil
-	}
-	for _, converter := range RegisteredConverters {
-		if converter.InputType == inType && converter.OutputType == outType && converter.IsDefaultTypeConverter {
-			return converter.ConversionFunc
+	var retErrT reflect.Type
+	if x.NumOut() == 2 {
+		retErrT = x.Out(1)
+		errorInterface := reflect.TypeOf((*error)(nil)).Elem()
+		if !retErrT.Implements(errorInterface) {
+			return nil, fmt.Errorf("second return argument should be an error")
 		}
 	}
-	return nil
-}
 
-func (flow *Flow) ConversionFunc(inType, outType string) (ConversionFn, error) {
-	if len(*flow) == 0 {
-		return nil, ErrMinOneFilter
-	}
+	v := reflect.ValueOf(converter)
+	fn := func(input interface{}) (interface{}, error) {
+		args := []reflect.Value{reflect.ValueOf(input)}
+		ret := v.Call(args)
 
-	lastRealInType := inType
-
-	fn := (*flow)[0].ConversionFunc
-	if convertFn := GetTypeConversionFunc(inType, (*flow)[0].InputType); convertFn != nil {
-		fn = Pipe(convertFn, fn)
-	}
-
-	if len(*flow) == 1 {
-		return fn, nil
-	}
-
-	inType = (*flow)[0].OutputType
-	for _, right := range (*flow)[1:] {
-		if inType != "interface{}" {
-			lastRealInType = inType
+		retV := ret[0].Interface()
+		var err error
+		if len(ret) == 2 {
+			if v := ret[1].Interface(); v != nil {
+				err = v.(error)
+			}
 		}
-		if convertFn := GetTypeConversionFunc(lastRealInType, right.InputType); convertFn != nil {
-			fn = Pipe(fn, convertFn)
-		}
-		fn = Pipe(fn, right.ConversionFunc)
-		inType = right.OutputType
+		return retV, err
 	}
 	return fn, nil
 }
 
-func (flow *Flow) Convert(input interface{}, output *interface{}) error {
-	fn, err := flow.ConversionFunc("interface{}", "interface{}")
-	if err != nil {
-		return err
+// parseString takes a string in input and tries to cast it in a more specific type (date, int, etc).
+// This function should be the first one to be called in a chain when using a CLI.
+func parseString(in string) interface{} {
+	if n, err := strconv.ParseInt(in, 10, 0); err == nil {
+		return n
 	}
-	return fn(input, output)
-}
-
-func GetConverterByName(name string) (*Converter, error) {
-	for _, converter := range RegisteredConverters {
-		if converter.Name == name {
-			return converter, nil
-		}
+	if n, err := strconv.ParseFloat(in, 64); err == nil {
+		return n
 	}
-	return nil, fmt.Errorf("no such filter %q", name) // nolint:goerr113
+
+	// FIXME: try to parse other formats first
+	return in
 }
 
-func Chain(left ConversionFn, rights ...ConversionFn) ConversionFn {
-	fn := left
-	for _, right := range rights {
-		fn = Pipe(fn, right)
+func rev(in string) (string, error) {
+	runes := []rune(in)
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
 	}
-	return fn
-}
-
-func Pipe(left, right ConversionFn) ConversionFn {
-	return func(in interface{}, output *interface{}) error {
-		var tmpOutput interface{}
-		if err := left(in, &tmpOutput); err != nil {
-			return err
-		}
-		return right(tmpOutput, output)
-	}
-}
-
-func ConversionToStreamConv(conversionFn ConversionFn) StreamConvFn {
-	return func(in chan interface{}) chan interface{} {
-		out := make(chan interface{})
-		go func() {
-			for input := range in {
-				var output interface{}
-				_ = conversionFn(input, &output)
-				// FIXME: check err
-				out <- output
-			}
-		}()
-		return out
-	}
-}
-
-func StreamPipe(left, right StreamConvFn) StreamConvFn {
-	return func(in chan interface{}) chan interface{} {
-		return right(left(in))
-	}
-}
-
-func StreamChain(streamFuncs ...StreamConvFn) StreamConvFn {
-	return func(in chan interface{}) chan interface{} {
-		left := in
-		for _, right := range streamFuncs {
-			left = right(left)
-		}
-		return left
-	}
-}
-
-type Converter struct {
-	InputType              string
-	OutputType             string
-	Name                   string
-	ConversionFunc         ConversionFn
-	StreamConvFunc         StreamConvFn
-	IsDefaultTypeConverter bool
-}
-
-func (conv *Converter) SetType(ioType string) *Converter {
-	conv.InputType = ioType
-	conv.OutputType = ioType
-	return conv
-}
-
-func (conv *Converter) SetTypes(inType, outType string) *Converter {
-	conv.InputType = inType
-	conv.OutputType = outType
-	return conv
-}
-
-func (conv *Converter) SetConversionFunc(fn ConversionFn) *Converter {
-	conv.ConversionFunc = fn
-	return conv
-}
-
-func (conv *Converter) SetStreamConvFunc(fn StreamConvFn) *Converter {
-	conv.StreamConvFunc = fn
-	return conv
-}
-
-func (conv *Converter) SetDefaultTypeConverter() *Converter {
-	conv.IsDefaultTypeConverter = true
-	return conv
-}
-
-func NewConverter(name string) *Converter {
-	return &Converter{
-		InputType:  "interface{}",
-		OutputType: "interface{}",
-		Name:       name,
-	}
-}
-
-var RegisteredConverters []*Converter
-
-func RegisterConverter(converter *Converter) {
-	RegisteredConverters = append(RegisteredConverters, converter)
+	return string(runes), nil
 }
