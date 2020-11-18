@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/Sirupsen/logrus"
-	"github.com/codegangsta/cli"
-	. "github.com/moul/converter"
+	"github.com/sirupsen/logrus"
+	"github.com/urfave/cli"
+	"moul.io/converter"
 )
 
 var (
@@ -26,7 +26,7 @@ func main() {
 	app.Before = hookBefore
 
 	app.Commands = []cli.Command{}
-	for _, filter := range RegisteredConverters {
+	for _, filter := range converter.RegisteredConverters {
 		command := cli.Command{
 			Name:         filter.Name,
 			Usage:        fmt.Sprintf("%s  ->  %s", filter.InputType, filter.OutputType),
@@ -36,11 +36,13 @@ func main() {
 		app.Commands = append(app.Commands, command)
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		logrus.Fatalf("run error: %v", err)
+	}
 }
 
 func BashComplete(c *cli.Context) {
-	for _, filter := range RegisteredConverters {
+	for _, filter := range converter.RegisteredConverters {
 		fmt.Println(filter.Name)
 	}
 }
@@ -56,7 +58,7 @@ func Action(c *cli.Context) {
 		logrus.Fatalf("You need to use at least one filter")
 	}
 
-	chain, err := NewConverterChain(args)
+	flow, err := converter.NewFlow(args)
 	if err != nil {
 		logrus.Fatalf("Failed to create a converter: %v", err)
 	}
@@ -66,7 +68,7 @@ func Action(c *cli.Context) {
 		logrus.Fatalf("Failed to read from stdin: %v", err)
 	}
 
-	conversionFunc, err := chain.ConversionFunc("[]byte", "interface{}")
+	conversionFunc, err := flow.ConversionFunc("[]byte", "interface{}")
 	if err != nil {
 		logrus.Fatalf("Failed to generate a conversion func: %v", err)
 	}

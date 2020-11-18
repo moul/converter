@@ -1,17 +1,21 @@
-go-test.json
+##
+## Specific to .dockerignore
+##
+
+.git/
+Dockerfile
+contrib/
+
+##
+## Common with .gitignore
+##
 
 # Temporary files
 *~
 *#
 .#*
-coverage.txt
-
-go-build.log
-go-install.log
-go-test.json
 
 # Vendors
-package-lock.json
 node_modules/
 vendor/
 

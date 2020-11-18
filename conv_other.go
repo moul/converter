@@ -6,8 +6,9 @@ import (
 	"time"
 )
 
+// nolint:gochecknoinits // need a refactor to remove it
 func init() {
-	RegisterConverter(NewConverter("fetch").SetTypes("string", "[]byte").SetConversionFunc(FetchUrlToBytes))
+	RegisterConverter(NewConverter("fetch").SetTypes("string", "[]byte").SetConversionFunc(FetchURLToBytes))
 	RegisterConverter(NewConverter("sleep-100ms").SetConversionFunc(HundredMillisecondDelayer))
 	RegisterConverter(NewConverter("sleep-1s").SetConversionFunc(OneSecondDelayer))
 	RegisterConverter(NewConverter("sleep-2s").SetConversionFunc(TwoSecondDelayer))
@@ -24,15 +25,17 @@ func Delayer(duration time.Duration) ConversionFn {
 	}
 }
 
-var HundredMillisecondDelayer = Delayer(100 * time.Millisecond)
-var OneSecondDelayer = Delayer(time.Second)
-var TwoSecondDelayer = Delayer(2 * time.Second)
-var FiveSecondDelayer = Delayer(5 * time.Second)
-var TenSecondDelayer = Delayer(10 * time.Second)
-var OneMinuteDelayer = Delayer(time.Minute)
+var (
+	HundredMillisecondDelayer = Delayer(100 * time.Millisecond) // nolint:gomnd
+	OneSecondDelayer          = Delayer(time.Second)            // nolint:gomnd
+	TwoSecondDelayer          = Delayer(2 * time.Second)        // nolint:gomnd
+	FiveSecondDelayer         = Delayer(5 * time.Second)        // nolint:gomnd
+	TenSecondDelayer          = Delayer(10 * time.Second)       // nolint:gomnd
+	OneMinuteDelayer          = Delayer(time.Minute)            // nolint:gomnd
+)
 
-func FetchUrlToBytes(in interface{}, out *interface{}) error {
-	resp, err := http.Get(in.(string))
+func FetchURLToBytes(in interface{}, out *interface{}) error {
+	resp, err := http.Get(in.(string)) // nolint:noctx
 	if err != nil {
 		return err
 	}

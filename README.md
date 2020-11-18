@@ -1,74 +1,103 @@
 # converter
+
 :scissors: multiformat data conversion
 
 [![Build Status](https://travis-ci.org/moul/converter.svg?branch=master)](https://travis-ci.org/moul/converter)
 [![GoDoc](https://godoc.org/github.com/moul/converter?status.svg)](https://godoc.org/github.com/moul/converter)
 [![Coverage Status](https://coveralls.io/repos/moul/converter/badge.svg?branch=master&service=github)](https://coveralls.io/github/moul/converter?branch=master)
 
-![](https://raw.githubusercontent.com/moul/converter/master/assets/dictionary.png)
+![dictionary](https://raw.githubusercontent.com/moul/converter/master/assets/dictionary.png)
 
 ## Usage
 
 `converter` can be used in the CLI as follow:
 
+[embedmd]:# (.tmp/usage.txt console)
 ```console
-$ converter --list-filters
-Available filters:
-- md5
-- sha1
-- base64-encode
-- base64-decode
-- base32-encode
-- base32-decode
-- hex-encode
-- hex-decode
-- xml-encode
-- xml-decode
-- json-encode
-- json-decode
-- toml-encode
-- csv-decode
-- fetch
-- sleep-100ms
-- sleep-1s
-- sleep-2s
-- sleep-5s
-- sleep-10s
-- sleep-1m
-- reverse
-- upper
-- lower
-- split-lines
-- to-unix
-- parse-ansi-date
-- parse-rfc339-date
-- parse-rfc822-date
-- parse-rfc850-date
-- parse-rfc1123-date
-- parse-unix-date
-- bytes-to-string
-- string-to-bytes
-- int-to-string
-- string-to-int
-- string-to-float
-- float-to-string
+foo@bar:~$ converter -h
+NAME:
+   converter - A new cli application
+
+USAGE:
+   converter [global options] command [command options] [arguments...]
+
+VERSION:
+    ()
+
+AUTHOR:
+   Manfred Touron <https://github.com/moul/converter>
+
+COMMANDS:
+   md5                   []byte  ->  string
+   sha1                  []byte  ->  string
+   base58-encode         []byte  ->  string
+   base58-decode         string  ->  []byte
+   base64-encode         []byte  ->  string
+   base64-decode         string  ->  []byte
+   urlbase64-encode      []byte  ->  string
+   urlbase64-decode      string  ->  []byte
+   rawurlbase64-encode   []byte  ->  string
+   rawurlbase64-decode   string  ->  []byte
+   base32-encode         []byte  ->  string
+   base32-decode         string  ->  []byte
+   hex-encode            []byte  ->  string
+   hex-decode            string  ->  []byte
+   xml-encode            interface{}  ->  []byte
+   xml-decode            []byte  ->  interface{}
+   json-encode           interface{}  ->  []byte
+   json-decode           []byte  ->  interface{}
+   toml-encode           []byte  ->  interface{}
+   csv-decode            string  ->  [][]string
+   fetch                 string  ->  []byte
+   sleep-100ms           interface{}  ->  interface{}
+   sleep-1s              interface{}  ->  interface{}
+   sleep-2s              interface{}  ->  interface{}
+   sleep-5s              interface{}  ->  interface{}
+   sleep-10s             interface{}  ->  interface{}
+   sleep-1m              interface{}  ->  interface{}
+   reverse               string  ->  string
+   upper                 string  ->  string
+   lower                 string  ->  string
+   split-lines           []byte  ->  []byte
+   to-unix               time.Time  ->  int64
+   parse-ansi-date       string  ->  time.Time
+   parse-rfc339-date     string  ->  time.Time
+   parse-rfc822-date     string  ->  time.Time
+   parse-rfc850-date     string  ->  time.Time
+   parse-rfc1123-date    string  ->  time.Time
+   parse-unix-date       string  ->  time.Time
+   parse-date            string  ->  time.Time
+   time-to-string        time.Time  ->  string
+   parse-unix-timestamp  int64  ->  time.Time
+   bytes-to-string       []byte  ->  string
+   string-to-bytes       string  ->  []byte
+   int-to-string         int64  ->  string
+   string-to-int         string  ->  int64
+   string-to-float       string  ->  float64
+   float-to-string       float64  ->  string
+   help, h               Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h     show help
+   --version, -v  print the version
 ```
 
+[embedmd]:# (.tmp/examples.txt console)
 ```console
-$ echo 'Hello World!' | converter reverse
+foo@bar:~$ echo -n "Hello World!" | converter reverse
 !dlroW olleH
-$ echo 'Hello World!' | converter md5
+foo@bar:~$ echo "Hello World!" | converter md5
 8ddd8be4b179a529afa5f2ffae4b9858
-$ echo 'Hello World!' | converter md5 md5
+foo@bar:~$ echo "Hello World!" | converter md5 md5
 b87408ae303f7ca8d4834e5ac3143d06
-$ echo 'Hello World!' | converter md5 md5 md5
+foo@bar:~$ echo "Hello World!" | converter md5 md5 md5
 710f24df02eb8e151074364ea23e1a39
-$ echo 'Hello World!' | converter reverse md5 upper reverse
+foo@bar:~$ echo "Hello World!" | converter reverse md5 upper reverse
 26E80BC257BC2EB49316825A8DB8E0C9
-$ echo 'Hello World!' | converter reverse md5 upper reverse base64-decode
+foo@bar:~$ echo "Hello World!" | converter reverse md5 upper reverse base64-decode
 [219 161 60 208 16 182 231 176 66 216 64 120 247 125 122 243 110 64 240 48 124 19 64 189]
-$ echo 'Hello World!' | converter reverse md5 upper reverse base64-decode bytes-to-string
-Û¡<ï¿½ï¿½ï¿½Bï¿½@xï¿½}zï¿½n@ï¿½0|@ï¿½
+foo@bar:~$ echo "Hello World!" | converter reverse md5 upper reverse base64-decode bytes-to-string
+Û¡<Ð¶ç°BØ@x÷}zón@ð0|@½
 ```
 
 ## Using with Docker
@@ -81,63 +110,6 @@ $ date | docker run --rm moul/converter md5 sha1
 ## Using as a Golang library
 
 See [GoDoc](https://godoc.org/github.com/moul/converter) for usage and examples.
-
-## Changelog
-
-### master (unreleased)
-
-* No entry
-
-### v1.0.0 (2015-12-02)
-
-* First release
-* Chaining support
-* Pipe support
-* Basic streaming support
-* Helper to convert a basic converter to streaming converter
-* Automtically detect intermediary converters if needed
-* Available filters:
-  * base32-decode
-  * base32-encode
-  * base64-decode
-  * base64-encode
-  * bytes-to-string
-  * csv-decode
-  * fetch
-  * float-to-string
-  * hex-decode
-  * hex-encode
-  * int-to-string
-  * json-decode
-  * json-encode
-  * lower
-  * md5
-  * parse-ansi-date
-  * parse-date
-  * parse-rfc1123-date
-  * parse-rfc339-date
-  * parse-rfc822-date
-  * parse-rfc850-date
-  * parse-unix-date
-  * parse-unix-timestamp
-  * reverse
-  * sha1
-  * sleep-100ms
-  * sleep-10s
-  * sleep-1m
-  * sleep-1s
-  * sleep-2s
-  * sleep-5s
-  * split-lines
-  * string-to-bytes
-  * string-to-float
-  * string-to-int
-  * time-to-string
-  * to-unix
-  * toml-encode
-  * upper
-  * xml-decode
-  * xml-encode
 
 ## Credit
 

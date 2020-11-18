@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// nolint:gochecknoinits // need a refactor to remove it
 func init() {
 	RegisterConverter(NewConverter("reverse").SetType("string").SetConversionFunc(ReverseString))
 	RegisterConverter(NewConverter("upper").SetType("string").SetConversionFunc(Uppercase))
@@ -34,13 +35,10 @@ func Lowercase(in interface{}, out *interface{}) (err error) {
 func StreamBufferSplitLines(in chan interface{}) chan interface{} {
 	out := make(chan interface{})
 	go func() {
-		for {
-			select {
-			case input := <-in:
-				var output interface{}
-				for _, output = range bytes.Split(input.([]byte), []byte("\n")) {
-					out <- output
-				}
+		for input := range in {
+			var output interface{}
+			for _, output = range bytes.Split(input.([]byte), []byte("\n")) {
+				out <- output
 			}
 		}
 	}()

@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// nolint:gochecknoinits // need a refactor to remove it
 func init() {
 	RegisterConverter(NewConverter("bytes-to-string").SetTypes("[]byte", "string").SetConversionFunc(ConvertBytesToString).SetDefaultTypeConverter())
 	RegisterConverter(NewConverter("string-to-bytes").SetTypes("string", "[]byte").SetConversionFunc(ConvertStringToBytes).SetDefaultTypeConverter())

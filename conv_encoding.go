@@ -13,6 +13,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+// nolint:gochecknoinits // need a refactor to remove it
 func init() {
 	RegisterConverter(NewConverter("base64-encode").SetTypes("[]byte", "string").SetConversionFunc(ConvertBytesToBase64))
 	RegisterConverter(NewConverter("base64-decode").SetTypes("string", "[]byte").SetConversionFunc(ConvertBase64ToBytes))
@@ -20,11 +21,11 @@ func init() {
 	RegisterConverter(NewConverter("base32-decode").SetTypes("string", "[]byte").SetConversionFunc(ConvertBase32ToBytes))
 	RegisterConverter(NewConverter("hex-encode").SetTypes("[]byte", "string").SetConversionFunc(ConvertBytesToHex))
 	RegisterConverter(NewConverter("hex-decode").SetTypes("string", "[]byte").SetConversionFunc(ConvertHexToBytes))
-	RegisterConverter(NewConverter("xml-encode").SetTypes("interface{}", "[]byte").SetConversionFunc(ConvertStructToXml))
-	RegisterConverter(NewConverter("xml-decode").SetTypes("[]byte", "interface{}").SetConversionFunc(ConvertXmlToStruct))
-	RegisterConverter(NewConverter("json-encode").SetTypes("interface{}", "[]byte").SetConversionFunc(ConvertStructToJson))
-	RegisterConverter(NewConverter("json-decode").SetTypes("[]byte", "interface{}").SetConversionFunc(ConvertJsonToStruct))
-	RegisterConverter(NewConverter("toml-encode").SetTypes("[]byte", "interface{}").SetConversionFunc(ConvertStructToToml))
+	RegisterConverter(NewConverter("xml-encode").SetTypes("interface{}", "[]byte").SetConversionFunc(ConvertStructToXML))
+	RegisterConverter(NewConverter("xml-decode").SetTypes("[]byte", "interface{}").SetConversionFunc(ConvertXMLToStruct))
+	RegisterConverter(NewConverter("json-encode").SetTypes("interface{}", "[]byte").SetConversionFunc(ConvertStructToJSON))
+	RegisterConverter(NewConverter("json-decode").SetTypes("[]byte", "interface{}").SetConversionFunc(ConvertJSONToStruct))
+	RegisterConverter(NewConverter("toml-encode").SetTypes("[]byte", "interface{}").SetConversionFunc(ConvertStructToTOML))
 	RegisterConverter(NewConverter("csv-decode").SetTypes("string", "[][]string").SetConversionFunc(ConvertStringToCsv))
 }
 
@@ -58,25 +59,25 @@ func ConvertHexToBytes(in interface{}, out *interface{}) (err error) {
 	return err
 }
 
-func ConvertXmlToStruct(in interface{}, out *interface{}) (err error) {
+func ConvertXMLToStruct(in interface{}, out *interface{}) (err error) {
 	return xml.Unmarshal(in.([]byte), out)
 }
 
-func ConvertStructToXml(in interface{}, out *interface{}) (err error) {
+func ConvertStructToXML(in interface{}, out *interface{}) (err error) {
 	*out, err = xml.Marshal(in)
 	return err
 }
 
-func ConvertJsonToStruct(in interface{}, out *interface{}) (err error) {
+func ConvertJSONToStruct(in interface{}, out *interface{}) (err error) {
 	return json.Unmarshal(in.([]byte), out)
 }
 
-func ConvertStructToJson(in interface{}, out *interface{}) (err error) {
+func ConvertStructToJSON(in interface{}, out *interface{}) (err error) {
 	*out, err = json.Marshal(in)
 	return err
 }
 
-func ConvertStructToToml(in interface{}, out *interface{}) (err error) {
+func ConvertStructToTOML(in interface{}, out *interface{}) (err error) {
 	buf := new(bytes.Buffer)
 	err = toml.NewEncoder(buf).Encode(in)
 	*out = buf.Bytes()
