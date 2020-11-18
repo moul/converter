@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// nolint:gochecknoinits // need a refactor to remove it
 func init() {
 	RegisterConverter(NewConverter("to-unix").SetTypes("time.Time", "int64").SetConversionFunc(ConvertTimeToUnix))
 	RegisterConverter(NewConverter("parse-ansi-date").SetTypes("string", "time.Time").SetConversionFunc(ConvertANSICToTime))
@@ -25,12 +26,14 @@ func DateToTimeConverter(format string) ConversionFn {
 	}
 }
 
-var ConvertANSICToTime = DateToTimeConverter(time.ANSIC)
-var ConvertRFC3339ToTime = DateToTimeConverter(time.RFC3339)
-var ConvertRFC822ToTime = DateToTimeConverter(time.RFC822)
-var ConvertRFC850ToTime = DateToTimeConverter(time.RFC850)
-var ConvertRFC1123ToTime = DateToTimeConverter(time.RFC1123)
-var ConvertUnixDateToTime = DateToTimeConverter(time.UnixDate)
+var (
+	ConvertANSICToTime    = DateToTimeConverter(time.ANSIC)
+	ConvertRFC3339ToTime  = DateToTimeConverter(time.RFC3339)
+	ConvertRFC822ToTime   = DateToTimeConverter(time.RFC822)
+	ConvertRFC850ToTime   = DateToTimeConverter(time.RFC850)
+	ConvertRFC1123ToTime  = DateToTimeConverter(time.RFC1123)
+	ConvertUnixDateToTime = DateToTimeConverter(time.UnixDate)
+)
 
 func ConvertTimeToUnix(in interface{}, out *interface{}) (err error) {
 	*out = in.(time.Time).Unix()

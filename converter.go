@@ -1,25 +1,31 @@
 package converter
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
-type ConversionFn func(interface{}, *interface{}) error
-type StreamConvFn func(chan interface{}) chan interface{}
+type (
+	ConversionFn func(interface{}, *interface{}) error
+	StreamConvFn func(chan interface{}) chan interface{}
+	Flow         []*Converter
+)
 
-type ConverterChain []*Converter
+var ErrMinOneFilter = errors.New("you should have at least one filter")
 
-func NewConverterChain(filterNames []string) (ConverterChain, error) {
+func NewFlow(filterNames []string) (Flow, error) {
 	if len(filterNames) == 0 {
-		return nil, fmt.Errorf("you should have at least one filter")
+		return nil, ErrMinOneFilter
 	}
-	chain := ConverterChain{}
+	flow := Flow{}
 	for _, name := range filterNames {
 		converter, err := GetConverterByName(name)
 		if err != nil {
 			return nil, err
 		}
-		chain = append(chain, converter)
+		flow = append(flow, converter)
 	}
-	return chain, nil
+	return flow, nil
 }
 
 func GetTypeConversionFunc(inType, outType string) ConversionFn {
@@ -29,7 +35,6 @@ func GetTypeConversionFunc(inType, outType string) ConversionFn {
 	if inType == "interface{}" || outType == "interface{}" {
 		return nil
 	}
-
 	for _, converter := range RegisteredConverters {
 		if converter.InputType == inType && converter.OutputType == outType && converter.IsDefaultTypeConverter {
 			return converter.ConversionFunc
@@ -38,24 +43,24 @@ func GetTypeConversionFunc(inType, outType string) ConversionFn {
 	return nil
 }
 
-func (chain *ConverterChain) ConversionFunc(inType, outType string) (ConversionFn, error) {
-	if len(*chain) == 0 {
-		return nil, fmt.Errorf("you should have at least one converter")
+func (flow *Flow) ConversionFunc(inType, outType string) (ConversionFn, error) {
+	if len(*flow) == 0 {
+		return nil, ErrMinOneFilter
 	}
 
 	lastRealInType := inType
 
-	fn := (*chain)[0].ConversionFunc
-	if convertFn := GetTypeConversionFunc(inType, (*chain)[0].InputType); convertFn != nil {
+	fn := (*flow)[0].ConversionFunc
+	if convertFn := GetTypeConversionFunc(inType, (*flow)[0].InputType); convertFn != nil {
 		fn = Pipe(convertFn, fn)
 	}
 
-	if len(*chain) == 1 {
+	if len(*flow) == 1 {
 		return fn, nil
 	}
 
-	inType = (*chain)[0].OutputType
-	for _, right := range (*chain)[1:] {
+	inType = (*flow)[0].OutputType
+	for _, right := range (*flow)[1:] {
 		if inType != "interface{}" {
 			lastRealInType = inType
 		}
@@ -68,8 +73,8 @@ func (chain *ConverterChain) ConversionFunc(inType, outType string) (ConversionF
 	return fn, nil
 }
 
-func (chain *ConverterChain) Convert(input interface{}, output *interface{}) error {
-	fn, err := chain.ConversionFunc("interface{}", "interface{}")
+func (flow *Flow) Convert(input interface{}, output *interface{}) error {
+	fn, err := flow.ConversionFunc("interface{}", "interface{}")
 	if err != nil {
 		return err
 	}
@@ -82,7 +87,7 @@ func GetConverterByName(name string) (*Converter, error) {
 			return converter, nil
 		}
 	}
-	return nil, fmt.Errorf("no such filter %q", name)
+	return nil, fmt.Errorf("no such filter %q", name) // nolint:goerr113
 }
 
 func Chain(left ConversionFn, rights ...ConversionFn) ConversionFn {
@@ -107,14 +112,11 @@ func ConversionToStreamConv(conversionFn ConversionFn) StreamConvFn {
 	return func(in chan interface{}) chan interface{} {
 		out := make(chan interface{})
 		go func() {
-			for {
-				select {
-				case input := <-in:
-					var output interface{}
-					_ = conversionFn(input, &output)
-					// FIXME: check err
-					out <- output
-				}
+			for input := range in {
+				var output interface{}
+				_ = conversionFn(input, &output)
+				// FIXME: check err
+				out <- output
 			}
 		}()
 		return out

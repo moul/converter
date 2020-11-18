@@ -5,12 +5,12 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/Sirupsen/logrus"
-	. "github.com/moul/converter"
+	"github.com/sirupsen/logrus"
+	"moul.io/converter"
 )
 
 func main() {
-	convertor := Chain(ConvertJsonToStruct, ConvertStructToToml)
+	convertor := converter.Chain(converter.ConvertJSONToStruct, converter.ConvertStructToTOML)
 	input, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		logrus.Fatalf("Failed to read from stdin: %v", err)
