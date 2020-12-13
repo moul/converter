@@ -33,6 +33,10 @@ func TestConverter(t *testing.T) {
 		{"hello world", []string{"rev", "rev"}, "hello world", false},
 		{"hello world", []string{"rev", "upper"}, "DLROW OLLEH", false},
 		{"hello world", []string{"upper", "rev"}, "DLROW OLLEH", false},
+		{"hello world", []string{"_string-to-bytes", "hex"}, "68656c6c6f20776f726c64", false},
+		{"hello world", []string{"_string-to-bytes", "md5", "hex"}, "5eb63bbbe01eeed093cb22bb8f5acdc3", false},
+		{"hello world", []string{"_string-to-bytes", "md5", "md5", "hex"}, "241d8a27c836427bd7f04461b60e7359", false},
+		{"hello world", []string{"_string-to-bytes", "sha1", "hex"}, "2aae6c35c94fcfb415dbe95f408b9ce91ee846ed", false},
 	}
 
 	for _, tc := range cases {
