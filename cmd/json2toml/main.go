@@ -3,21 +3,35 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"moul.io/converter"
 )
 
 func main() {
-	convertor := converter.Chain(converter.ConvertJSONToStruct, converter.ConvertStructToTOML)
+	err := run()
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+}
+
+func run() error {
+	fn, err := converter.ChainFunc([]string{"json-decode", "toml", "_bytes-to-string"})
+	if err != nil {
+		return err
+	}
+
 	input, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
-		logrus.Fatalf("Failed to read from stdin: %v", err)
+		return err
 	}
-	var output interface{}
-	if err = convertor(input, &output); err != nil {
-		logrus.Fatalf("Failed to convert from json to toml: %v", err)
+
+	ret, err := fn(input)
+	if err != nil {
+		return err
 	}
-	fmt.Printf("%s", output.([]byte))
+
+	fmt.Println(ret)
+	return nil
 }
