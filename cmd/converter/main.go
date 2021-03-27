@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
+	"sort"
 
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 	"moul.io/converter"
 )
@@ -20,63 +21,60 @@ func main() {
 	app.Name = "converter"
 	app.Author = "Manfred Touron"
 	app.Email = "https://github.com/moul/converter"
-	app.Version = VERSION + " (" + GITCOMMIT + ")"
+	if VERSION != "" || GITCOMMIT != "" {
+		app.Version = VERSION + " (" + GITCOMMIT + ")"
+	}
 	app.EnableBashCompletion = true
 
-	app.Before = hookBefore
-
 	app.Commands = []cli.Command{}
-	for _, filter := range converter.RegisteredConverters {
+	filters := []string{}
+	for filter := range converter.Converters {
+		filters = append(filters, filter)
+	}
+	sort.Strings(filters)
+	for _, filter := range filters {
 		command := cli.Command{
-			Name:         filter.Name,
-			Usage:        fmt.Sprintf("%s  ->  %s", filter.InputType, filter.OutputType),
+			Name:         filter,
 			Action:       Action,
 			BashComplete: BashComplete,
+			Hidden:       filter[0] == '_',
+			// Usage: fmt.Sprintf("%s  ->  %s", filter.InputType, filter.OutputType),
 		}
 		app.Commands = append(app.Commands, command)
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		logrus.Fatalf("run error: %v", err)
+		log.Fatalf("Error: %v", err)
 	}
 }
 
 func BashComplete(c *cli.Context) {
-	for _, filter := range converter.RegisteredConverters {
-		fmt.Println(filter.Name)
+	for filter := range converter.Converters {
+		fmt.Println(filter)
 	}
 }
 
-func hookBefore(c *cli.Context) error {
-	// configure logrus
-	return nil
-}
-
-func Action(c *cli.Context) {
+func Action(c *cli.Context) error {
 	args := append([]string{c.Command.Name}, c.Args()...)
 	if len(args) == 0 {
-		logrus.Fatalf("You need to use at least one filter")
+		return fmt.Errorf("you need to use at least one filter") // nolint:goerr113
 	}
 
-	flow, err := converter.NewFlow(args)
+	fn, err := converter.ChainFunc(args)
 	if err != nil {
-		logrus.Fatalf("Failed to create a converter: %v", err)
+		return fmt.Errorf("failed to create a converter: %w", err)
 	}
 
 	input, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
-		logrus.Fatalf("Failed to read from stdin: %v", err)
+		return fmt.Errorf("failed to read from stdin: %w", err)
 	}
 
-	conversionFunc, err := flow.ConversionFunc("[]byte", "interface{}")
+	output, err := fn(input)
 	if err != nil {
-		logrus.Fatalf("Failed to generate a conversion func: %v", err)
-	}
-
-	var output interface{}
-	if err = conversionFunc(input, &output); err != nil {
-		logrus.Fatalf("Failed to convert: %v", err)
+		return fmt.Errorf("failed to convert: %w", err)
 	}
 
 	fmt.Printf("%v\n", output)
+	return nil
 }

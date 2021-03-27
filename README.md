@@ -21,82 +21,57 @@ NAME:
 USAGE:
    converter [global options] command [command options] [arguments...]
 
-VERSION:
-    ()
-
 AUTHOR:
    Manfred Touron <https://github.com/moul/converter>
 
 COMMANDS:
-   md5                   []byte  ->  string
-   sha1                  []byte  ->  string
-   base58-encode         []byte  ->  string
-   base58-decode         string  ->  []byte
-   base64-encode         []byte  ->  string
-   base64-decode         string  ->  []byte
-   urlbase64-encode      []byte  ->  string
-   urlbase64-decode      string  ->  []byte
-   rawurlbase64-encode   []byte  ->  string
-   rawurlbase64-decode   string  ->  []byte
-   base32-encode         []byte  ->  string
-   base32-decode         string  ->  []byte
-   hex-encode            []byte  ->  string
-   hex-decode            string  ->  []byte
-   xml-encode            interface{}  ->  []byte
-   xml-decode            []byte  ->  interface{}
-   json-encode           interface{}  ->  []byte
-   json-decode           []byte  ->  interface{}
-   toml-encode           []byte  ->  interface{}
-   csv-decode            string  ->  [][]string
-   fetch                 string  ->  []byte
-   sleep-100ms           interface{}  ->  interface{}
-   sleep-1s              interface{}  ->  interface{}
-   sleep-2s              interface{}  ->  interface{}
-   sleep-5s              interface{}  ->  interface{}
-   sleep-10s             interface{}  ->  interface{}
-   sleep-1m              interface{}  ->  interface{}
-   reverse               string  ->  string
-   upper                 string  ->  string
-   lower                 string  ->  string
-   split-lines           []byte  ->  []byte
-   to-unix               time.Time  ->  int64
-   parse-ansi-date       string  ->  time.Time
-   parse-rfc339-date     string  ->  time.Time
-   parse-rfc822-date     string  ->  time.Time
-   parse-rfc850-date     string  ->  time.Time
-   parse-rfc1123-date    string  ->  time.Time
-   parse-unix-date       string  ->  time.Time
-   parse-date            string  ->  time.Time
-   time-to-string        time.Time  ->  string
-   parse-unix-timestamp  int64  ->  time.Time
-   bytes-to-string       []byte  ->  string
-   string-to-bytes       string  ->  []byte
-   int-to-string         int64  ->  string
-   string-to-int         string  ->  int64
-   string-to-float       string  ->  float64
-   float-to-string       float64  ->  string
-   help, h               Shows a list of commands or help for one command
+   base32
+   base32-decode
+   base58
+   base58-decode
+   base64
+   base64-decode
+   csv-decode
+   hex
+   hex-decode
+   hexbase32
+   hexbase32-decode
+   json
+   json-decode
+   lower
+   md5
+   rawurlbase64
+   rawurlbase64-decode
+   rev
+   sha1
+   title
+   toml
+   upper
+   urlbase64
+   urlbase64-decode
+   xml
+   xml-decode
+   help, h              Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --help, -h     show help
-   --version, -v  print the version
+   --help, -h  show help
 ```
 
 [embedmd]:# (.tmp/examples.txt console)
 ```console
-foo@bar:~$ echo -n "Hello World!" | converter reverse
+foo@bar:~$ echo -n "Hello World!" | converter _bytes-to-string rev
 !dlroW olleH
 foo@bar:~$ echo "Hello World!" | converter md5
-8ddd8be4b179a529afa5f2ffae4b9858
+[141 221 139 228 177 121 165 41 175 165 242 255 174 75 152 88]
 foo@bar:~$ echo "Hello World!" | converter md5 md5
-b87408ae303f7ca8d4834e5ac3143d06
+[98 213 234 111 247 90 250 37 61 11 160 58 20 171 41 82]
 foo@bar:~$ echo "Hello World!" | converter md5 md5 md5
-710f24df02eb8e151074364ea23e1a39
-foo@bar:~$ echo "Hello World!" | converter reverse md5 upper reverse
+[133 150 171 125 251 139 53 229 243 216 47 103 80 243 191 9]
+foo@bar:~$ echo "Hello World!" | converter _bytes-to-string rev _string-to-bytes md5 hex upper rev
 26E80BC257BC2EB49316825A8DB8E0C9
-foo@bar:~$ echo "Hello World!" | converter reverse md5 upper reverse base64-decode
+foo@bar:~$ echo "Hello World!" | converter _bytes-to-string rev _string-to-bytes md5 hex upper rev base64-decode
 [219 161 60 208 16 182 231 176 66 216 64 120 247 125 122 243 110 64 240 48 124 19 64 189]
-foo@bar:~$ echo "Hello World!" | converter reverse md5 upper reverse base64-decode bytes-to-string
+foo@bar:~$ echo "Hello World!" | converter _bytes-to-string rev _string-to-bytes md5 hex upper rev base64-decode bytes-to-string
 Û¡<Ð¶ç°BØ@x÷}zón@ð0|@½
 ```
 
