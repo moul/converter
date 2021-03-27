@@ -3,20 +3,38 @@ package converter
 import (
 	"crypto/md5"
 	"crypto/sha1"
+	"encoding/base32"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/mr-tron/base58"
 )
 
 // Converters is a map containing converters that can be called using a name.
 var Converters = map[string]interface{}{
-	"rev":   rev,
-	"upper": strings.ToUpper,
-	"lower": strings.ToLower,
-	"md5":   func(in []byte) []byte { ret := md5.Sum(in); return ret[:] },
-	"sha1":  func(in []byte) []byte { ret := sha1.Sum(in); return ret[:] },
-	"title": strings.Title,
-	"hex":   func(in []byte) string { return fmt.Sprintf("%x", in) },
+	"base32":              base32.StdEncoding.EncodeToString,
+	"base32-decode":       base32.StdEncoding.DecodeString,
+	"base58":              base58.Encode,
+	"base58-decode":       base58.Decode,
+	"base64":              base64.StdEncoding.EncodeToString,
+	"base64-decode":       base64.StdEncoding.DecodeString,
+	"hex":                 func(in []byte) string { return fmt.Sprintf("%x", in) },
+	"hex-decode":          hex.DecodeString,
+	"hexbase32":           base32.HexEncoding.EncodeToString,
+	"hexbase32-decode":    base32.HexEncoding.DecodeString,
+	"lower":               strings.ToLower,
+	"md5":                 func(in []byte) []byte { ret := md5.Sum(in); return ret[:] },
+	"rawurlbase64":        base64.RawURLEncoding.EncodeToString,
+	"rawurlbase64-decode": base64.RawURLEncoding.DecodeString,
+	"rev":                 rev,
+	"sha1":                func(in []byte) []byte { ret := sha1.Sum(in); return ret[:] },
+	"title":               strings.Title,
+	"upper":               strings.ToUpper,
+	"urlbase64":           base64.URLEncoding.EncodeToString,
+	"urlbase64-decode":    base64.URLEncoding.DecodeString,
 
 	// internal
 	"_parse-string":      parseString,
