@@ -29,9 +29,6 @@ func main() {
 	app.Commands = []cli.Command{}
 	filters := []string{}
 	for filter := range converter.Converters {
-		if filter[0] == '_' {
-			continue
-		}
 		filters = append(filters, filter)
 	}
 	sort.Strings(filters)
@@ -40,6 +37,7 @@ func main() {
 			Name:         filter,
 			Action:       Action,
 			BashComplete: BashComplete,
+			Hidden:       filter[0] == '_',
 			// Usage: fmt.Sprintf("%s  ->  %s", filter.InputType, filter.OutputType),
 		}
 		app.Commands = append(app.Commands, command)
