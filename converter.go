@@ -66,7 +66,7 @@ func converterToFunc(converter interface{}) (Func, error) {
 		return nil, fmt.Errorf("invalid amount of parameters")
 	}
 	var retErrT reflect.Type
-	if x.NumOut() == 2 {
+	if x.NumOut() == 2 { // nolint:gomnd
 		retErrT = x.Out(1)
 		errorInterface := reflect.TypeOf((*error)(nil)).Elem()
 		if !retErrT.Implements(errorInterface) {
@@ -81,7 +81,7 @@ func converterToFunc(converter interface{}) (Func, error) {
 
 		retV := ret[0].Interface()
 		var err error
-		if len(ret) == 2 {
+		if len(ret) == 2 { // nolint:gomnd
 			if v := ret[1].Interface(); v != nil {
 				err = v.(error)
 			}

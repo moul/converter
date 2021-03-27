@@ -2,8 +2,8 @@ package converter
 
 import (
 	"bytes"
-	"crypto/md5"
-	"crypto/sha1"
+	"crypto/md5"  // nolint:gosec
+	"crypto/sha1" // nolint:gosec
 	"encoding/base32"
 	"encoding/base64"
 	"encoding/csv"
@@ -186,12 +186,12 @@ func hexbase32Decode(in string) ([]byte, error) {
 }
 
 func md5Sum(in []byte) []byte {
-	ret := md5.Sum(in)
+	ret := md5.Sum(in) // nolint:gosec
 	return ret[:]
 }
 
 func sha1Sum(in []byte) []byte {
-	ret := sha1.Sum(in)
+	ret := sha1.Sum(in) // nolint:gosec
 	return ret[:]
 }
 

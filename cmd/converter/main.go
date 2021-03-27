@@ -57,22 +57,22 @@ func BashComplete(c *cli.Context) {
 func Action(c *cli.Context) error {
 	args := append([]string{c.Command.Name}, c.Args()...)
 	if len(args) == 0 {
-		return fmt.Errorf("you need to use at least one filter")
+		return fmt.Errorf("you need to use at least one filter") // nolint:goerr113
 	}
 
 	fn, err := converter.ChainFunc(args)
 	if err != nil {
-		return fmt.Errorf("Failed to create a converter: %w", err)
+		return fmt.Errorf("failed to create a converter: %w", err)
 	}
 
 	input, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
-		return fmt.Errorf("Failed to read from stdin: %w", err)
+		return fmt.Errorf("failed to read from stdin: %w", err)
 	}
 
 	output, err := fn(input)
 	if err != nil {
-		return fmt.Errorf("Failed to convert: %w", err)
+		return fmt.Errorf("failed to convert: %w", err)
 	}
 
 	fmt.Printf("%v\n", output)
