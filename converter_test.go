@@ -55,6 +55,14 @@ func TestConverter(t *testing.T) {
 		{"hello world", []string{"_string-to-bytes", "base64", "base64-decode", "_bytes-to-string"}, "hello world", false, false},
 		{"hello world", []string{"_string-to-bytes", "urlbase64", "urlbase64-decode", "_bytes-to-string"}, "hello world", false, false},
 		{"hello world", []string{"_string-to-bytes", "rawurlbase64", "rawurlbase64-decode", "_bytes-to-string"}, "hello world", false, false},
+		{[]string{"hello", "world"}, []string{"json", "_bytes-to-string"}, `["hello","world"]`, false, false},
+		{map[string]string{"a": "hello", "b": "world"}, []string{"toml", "_bytes-to-string"}, "a = \"hello\"\nb = \"world\"\n", false, false},
+		{`["hello","world"]`, []string{"_string-to-bytes", "json-decode", "json", "_bytes-to-string"}, `["hello","world"]`, false, false},
+		{`{"a": ["hello", "world"]}`, []string{"_string-to-bytes", "json-decode", "toml", "_bytes-to-string"}, "a = [\"hello\", \"world\"]\n", false, false},
+		{"a,b,c\n1,2,3\n", []string{"csv-decode"}, [][]string{[]string{"a", "b", "c"}, []string{"1", "2", "3"}}, false, false},
+		{"a,b,c\n1,2,3\n", []string{"csv-decode", "json", "_bytes-to-string"}, `[["a","b","c"],["1","2","3"]]`, false, false},
+		// {map[string]string{"a": "hello", "b": "world"}, []string{"xml", "_bytes-to-string"}, "a = \"hello\"\nb = \"world\"\n", false, false},
+		// {"<string>Hello</string><int>42</int><float64>3.1415</float64>", []string{"_string-to-bytes", "xml-decode"}, "salut", false, false},
 	}
 
 	for _, tc := range cases {
