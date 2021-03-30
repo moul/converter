@@ -10,4 +10,5 @@ require (
 	github.com/tailscale/depaware v0.0.0-20201214215404-77d1e9757027
 	github.com/urfave/cli v1.22.5
 	golang.org/x/tools v0.1.0
+	gopkg.in/yaml.v2 v2.2.3 // indirect
 )
