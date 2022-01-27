@@ -9,5 +9,5 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tailscale/depaware v0.0.0-20210622194025-720c4b409502
 	github.com/urfave/cli v1.22.5
-	golang.org/x/tools v0.1.5
+	golang.org/x/tools v0.1.9
 )
