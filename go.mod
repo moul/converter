@@ -1,13 +1,21 @@
 module moul.io/converter
 
-go 1.15
+go 1.26
 
 require (
-	github.com/BurntSushi/toml v0.3.1
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/mr-tron/base58 v1.2.0
-	github.com/stretchr/testify v1.7.0
-	github.com/tailscale/depaware v0.0.0-20210622194025-720c4b409502
-	github.com/urfave/cli v1.22.5
-	golang.org/x/tools v0.1.5
+	github.com/BurntSushi/toml v1.5.0
+	github.com/mr-tron/base58 v1.3.0
+	github.com/stretchr/testify v1.12.1
+	github.com/tailscale/depaware v0.0.0-20260720165112-f20f66241ec6
+	github.com/urfave/cli v1.22.17
+	golang.org/x/tools v0.49.0
+)
+
+require (
+	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
+	github.com/pkg/diff v0.0.0-20241224192749-4e6772a4315c // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
+	golang.org/x/mod v0.39.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
 )
